@@ -54,6 +54,11 @@ namespace ImPulse.Core.Pooling
             }
         }
 
+        void OnDestroy()
+        {
+            Instance = null;
+        }
+
         public GameObject Get(GameObject prefab, Vector3 position, Quaternion rotation)
         {
             if (prefab == null) return null;

@@ -4,20 +4,19 @@ using ImPulse.Core;
 namespace ImPulse.Enemies
 {
     [RequireComponent(typeof(CustomCollider))]
-    public abstract class Enemy : MonoBehaviour
+    public abstract class Enemy : HasHealth 
     {
-        [Header("Base Stats")]
-        public float maxHealth = 50f;
+        [Header("Movement Stats")]
         public float moveSpeed = 3f;
 
-        protected float _currentHealth;
         protected CustomCollider _collider;
         protected AudioHandler _audioHandler;
         protected Transform _playerTransform;
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            _currentHealth = maxHealth;
+            base.Awake();
+
             _collider = GetComponent<CustomCollider>();
             _audioHandler = FindAnyObjectByType<AudioHandler>();
 
@@ -82,17 +81,11 @@ namespace ImPulse.Enemies
         protected virtual void CollisionStay(CustomCollider other) { }
         protected virtual void CollisionExit(CustomCollider other) { }
 
-        public virtual void TakeDamage(float amount)
+        protected override void Die()
         {
-            _currentHealth -= amount;
-            if (_currentHealth <= 0f)
-            {
-                Die();
-            }
-        }
-
-        protected virtual void Die()
-        {
+            if (_isDead) return;
+            
+            base.Die(); 
             Destroy(gameObject);
         }
     }

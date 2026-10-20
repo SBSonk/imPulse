@@ -23,12 +23,16 @@ namespace ImPulse.Enemies
             if (spriteRenderer != null) spriteRenderer.color = baseColor;
         }
 
+        void OnValidate()
+        {
+            GetComponentInChildren<SpriteRenderer>().color = baseColor;
+        }
+
         protected override void HandleMovement()
         {
             if (_isDead || _playerTransform == null) return;
 
             Vector3 direction = (_playerTransform.position - transform.position).normalized;
-            direction.y = 0; 
             
             transform.position += direction * moveSpeed * Time.deltaTime;
         }

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using ImPulse.Helpers;
 using System;
+using ImPulse.Core;
 
 namespace ImPulse.Player
 {
@@ -35,6 +36,8 @@ namespace ImPulse.Player
         [SerializeField] MovementState _currentState = MovementState.Idle;
         [SerializeField] Vector3 _currentVelocity;
 
+        RhythmInputHandler _rhythmInputHandler;
+
         public Action OnDashStart;
 
         private Vector3 _currentInputDirection;
@@ -46,6 +49,11 @@ namespace ImPulse.Player
 
         private bool _dashTriggered;
         private bool _hasStateControl = true;
+
+        void Start()
+        {
+            _rhythmInputHandler = FindAnyObjectByType<RhythmInputHandler>();
+        }
 
         private void Update()
         {
@@ -169,6 +177,8 @@ namespace ImPulse.Player
             _dashDirection = _currentInputDirection;
 
             OnDashStart?.Invoke();
+
+            _rhythmInputHandler.ProcessInput();
         }
 
         void ApplyFriction(float friction)
