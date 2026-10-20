@@ -15,8 +15,6 @@ namespace ImPulse.Enemies
         [Header("VFX")]
         public GameObject deathParticlePrefab;
 
-        private bool _isDead = false;
-
         protected override void Awake()
         {
             base.Awake();

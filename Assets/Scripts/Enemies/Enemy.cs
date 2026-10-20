@@ -64,8 +64,12 @@ namespace ImPulse.Enemies
             }
         }
 
-        protected virtual void Update()
+
+
+        protected override void Update()
         {
+            base.Update();
+
             if (_playerTransform == null && CustomCollider.LayerGroups[(int)CollisionLayer.Player].Count > 0)
             {
                 _playerTransform = CustomCollider.LayerGroups[(int)CollisionLayer.Player][0].transform;
