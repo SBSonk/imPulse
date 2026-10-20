@@ -16,21 +16,11 @@ namespace ImPulse.UI
         [SerializeField] private float mainDuration = 0.2f;
         [SerializeField] private EaseType mainEaseType = EaseType.OutQuad;
 
-        [Header("Ghost Animation")]
-        [SerializeField] private float ghostHoldTime = 0.5f;
-        [SerializeField] private float ghostDuration = 0.4f;
-        [SerializeField] private EaseType ghostEaseType = EaseType.OutCubic;
-
         private float _targetT = 1f;
         
         private float _currentMainT = 1f;
         private float _startMainT = 1f;
         private float _mainTimer = 0f;
-
-        private float _currentGhostT = 1f;
-        private float _startGhostT = 1f;
-        private float _ghostTimer = 0f;
-        private float _ghostHoldTimer = 0f;
 
         private float _startPosX;
 
@@ -60,23 +50,6 @@ namespace ImPulse.UI
                 _currentMainT = Mathf.Lerp(_startMainT, _targetT, easeVal);
                 UpdateBarPosition(mainBar, _currentMainT);
             }
-
-            if (ghostBar != null)
-            {
-                if (_ghostHoldTimer > 0f)
-                {
-                    _ghostHoldTimer -= Time.deltaTime;
-                }
-                else if (_ghostTimer < ghostDuration)
-                {
-                    _ghostTimer += Time.deltaTime;
-                    float normTime = Mathf.Clamp01(_ghostTimer / ghostDuration);
-                    float easeVal = Easing.Evaluate(ghostEaseType, normTime);
-                    
-                    _currentGhostT = Mathf.Lerp(_startGhostT, _targetT, easeVal);
-                    UpdateBarPosition(ghostBar, _currentGhostT);
-                }
-            }
         }
 
         public void SetFill(float t)
@@ -85,21 +58,6 @@ namespace ImPulse.UI
 
             _startMainT = _currentMainT;
             _mainTimer = 0f;
-
-            if (t < _targetT)
-            {
-                _ghostHoldTimer = ghostHoldTime;
-                _startGhostT = _currentGhostT;
-                _ghostTimer = 0f;
-            }
-            else if (t > _targetT)
-            {
-                // healing should follow instantly
-                _currentGhostT = t;
-                _startGhostT = t;
-                _ghostTimer = ghostDuration; 
-                UpdateBarPosition(ghostBar, _currentGhostT);
-            }
 
             _targetT = t;
         }
@@ -112,14 +70,9 @@ namespace ImPulse.UI
             _currentMainT = t;
             _startMainT = t;
             _mainTimer = mainDuration;
-            
-            _currentGhostT = t;
-            _startGhostT = t;
-            _ghostTimer = ghostDuration;
-            _ghostHoldTimer = 0f;
+        
 
             UpdateBarPosition(mainBar, _currentMainT);
-            if (ghostBar != null) UpdateBarPosition(ghostBar, _currentGhostT);
         }
 
         private void UpdateBarPosition(RectTransform bar, float tValue)
