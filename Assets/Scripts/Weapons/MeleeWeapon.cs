@@ -1,5 +1,6 @@
 using UnityEngine;
 using ImPulse.Player;
+using ImPulse.Core;
 
 namespace ImPulse.Weapons
 {
@@ -11,7 +12,7 @@ namespace ImPulse.Weapons
         [Header("Animations")]
         public string[] comboAnimations;
         
-        public LayerMask enemyLayer;
+        public CollisionLayerMask enemyLayer;
         
         // You can add common Melee helper functions here
         // like a protected OverlapSphere function to handle damage calculations.

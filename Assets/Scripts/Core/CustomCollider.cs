@@ -77,7 +77,7 @@ namespace ImPulse.Core
             _activeCollisions.Clear();
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (layersToCheck == CollisionLayerMask.None) return;
 

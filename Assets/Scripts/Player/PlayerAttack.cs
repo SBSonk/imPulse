@@ -23,6 +23,8 @@ namespace ImPulse.Player
         public float comboWindow = 1.0f;
         public float attackCancelTime = 0.5f;
 
+        [SerializeField] Transform bulletOrigin;
+
         [Header("State (Read Only)")]
         [SerializeField] AttackState _currentState = AttackState.Idle;
 
@@ -160,7 +162,6 @@ namespace ImPulse.Player
                 }
             }
 
-            // Evaluate weapon logic right before incrementing the index so the weapon receives the 0-based hit index
             if (isRanged && equippedRangedWeapon != null)
             {
                 if (_currentAttackIndex == maxComboLength - 1) 
@@ -239,5 +240,7 @@ namespace ImPulse.Player
                 _playerMovement.FreeAttackState();
             }
         }
+
+        public Transform GetBulletOrigin() => bulletOrigin;
     }
 }

@@ -43,6 +43,7 @@ namespace ImPulse.Core
         public event Action<int> OnQuarterPatternBeat;
 
         private AudioSource _audioSource;
+        private double _baseBpm;
         private double _dspSongStartTime;
         private double _secPerBeat;
         
@@ -55,13 +56,14 @@ namespace ImPulse.Core
         {
             _audioSource = GetComponent<AudioSource>();
             _audioSource.clip = trackClip;
-            _audioSource.pitch = playbackSpeed; 
+            
+            // Store the initial BPM before any modifiers are applied
+            _baseBpm = bpm; 
 
-            bpm = bpm * playbackSpeed;
+            // Initialize audio using the new update function
+            SetPlaybackSpeed(playbackSpeed);
 
-            _secPerBeat = 60.0 / bpm;
             _dspSongStartTime = AudioSettings.dspTime + startOffset;
-
             _audioSource.PlayScheduled(_dspSongStartTime);
         }
 
@@ -98,6 +100,29 @@ namespace ImPulse.Core
                     EvaluatePattern(_nextQuarterBeatIndex, PatternResolution.Quarter);
                     _nextQuarterBeatIndex++;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Dynamically updates the audio pitch and recalculates beat timings without breaking the current progression.
+        /// </summary>
+        public void SetPlaybackSpeed(float newSpeed)
+        {
+            playbackSpeed = Mathf.Clamp(newSpeed, 0.1f, 3f);
+            
+            if (_audioSource != null)
+            {
+                _audioSource.pitch = playbackSpeed;
+            }
+
+            bpm = _baseBpm * playbackSpeed;
+            _secPerBeat = 60.0 / bpm;
+
+            // If the song is already playing, we must shift the DSP start time backwards or forwards.
+            // Otherwise, updating _secPerBeat will instantly drastically alter songPositionInBeats.
+            if (_hasSongStarted)
+            {
+                _dspSongStartTime = AudioSettings.dspTime - (songPositionInBeats * _secPerBeat);
             }
         }
 

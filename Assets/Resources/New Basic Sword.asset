@@ -19,6 +19,4 @@ MonoBehaviour:
   - SwordSwing1
   - SwordSwing2
   - SwordSwing3
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 0
+  enemyLayer: 0
