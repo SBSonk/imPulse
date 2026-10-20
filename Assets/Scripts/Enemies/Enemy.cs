@@ -6,8 +6,13 @@ namespace ImPulse.Enemies
     [RequireComponent(typeof(CustomCollider))]
     public abstract class Enemy : HasHealth 
     {
+        [Header("Attack Stats")]
+        [SerializeField] protected float damage = 10;
+        [SerializeField] protected float knockbackStrength = 5;
+        [SerializeField] protected float stunLength = .5f;
+
         [Header("Movement Stats")]
-        public float moveSpeed = 3f;
+        [SerializeField] protected float moveSpeed = 3f;
 
         protected CustomCollider _collider;
         protected AudioHandler _audioHandler;

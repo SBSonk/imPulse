@@ -1,5 +1,7 @@
 using UnityEngine;
 using ImPulse.Core.Pooling;
+using ImPulse.Core;
+using ImPulse.Player;
 
 namespace ImPulse.Enemies
 {
@@ -66,6 +68,26 @@ namespace ImPulse.Enemies
                 }
                 
                 base.Die(); 
+            }
+        }
+
+        protected override void CollisionEnter(CustomCollider other)
+        {
+            if (other.layer != CollisionLayer.Player) return;
+
+            bool tookDamage = false;
+            if (other.TryGetComponent<PlayerStatus>(out var playerStatus))
+            {
+                tookDamage = playerStatus.TakeDamage(damage);
+            }
+
+            if (!tookDamage) return;
+
+            if (other.TryGetComponent<PlayerMovement>(out var playerMovement))
+            {
+                var dirToPlayer = other.transform.position - transform.position;
+                dirToPlayer.Normalize();
+                playerMovement.ApplyKnockback(dirToPlayer, knockbackStrength, stunLength);
             }
         }
     }
