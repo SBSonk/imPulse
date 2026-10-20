@@ -8,6 +8,11 @@ namespace ImPulse.Player
         [Header("Iframes")]
         [SerializeField] float dashInvincibilityTime = .25f;
 
+        [Header("Dynamic Damage Reduction")]
+        [SerializeField] [Range(0f, 1f)] float startReductionThreshold = 0.30f;
+        [SerializeField] [Range(0f, 1f)] float maxReductionThreshold = 0.10f;
+        [SerializeField] [Range(0f, 1f)] float maxDamageReduction = 0.50f;
+
         private Animator _animator;
         private PlayerMovement _playerMovement;
         private PlayerAttack _playerAttack;
@@ -28,7 +33,10 @@ namespace ImPulse.Player
 
         void OnDestroy()
         {
-            _playerMovement.OnDashStart -= ApplyDashInvincibility;
+            if (_playerMovement != null)
+            {
+                _playerMovement.OnDashStart -= ApplyDashInvincibility;
+            }
         }
 
         void ApplyDashInvincibility()
@@ -38,11 +46,18 @@ namespace ImPulse.Player
 
         public override bool TakeDamage(float amount)
         {
-            bool damageAccepted = base.TakeDamage(amount);
+            float healthRatio = currentHealth / maxHealth;
+            
+            // damage reduction for lower health to make the abstract health bar actually feel fair lol
+            float reductionT = Mathf.InverseLerp(startReductionThreshold, maxReductionThreshold, healthRatio);
+            float damageReduction = Mathf.Lerp(0f, maxDamageReduction, reductionT);
+            float finalDamage = amount * (1f - damageReduction);
+
+            bool damageAccepted = base.TakeDamage(finalDamage);
 
             if (damageAccepted && !_isDead)
             {
-                UnityEngine.Debug.Log($"Player took {amount} damage! HP: {currentHealth}/{maxHealth}");
+                UnityEngine.Debug.Log($"Player took {finalDamage:F1} damage (Reduced by {damageReduction * 100:F0}%). HP: {currentHealth:F1}/{maxHealth}");
             }
 
             return damageAccepted;

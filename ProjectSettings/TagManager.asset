@@ -41,6 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Projectiles
+    uniqueID: 3516057305
+    locked: 0
+  - name: Enemy
+    uniqueID: 798216621
+    locked: 0
+  - name: Player
+    uniqueID: 1304552619
+    locked: 0
+  - name: UI
+    uniqueID: 1581849089
+    locked: 0
   m_RenderingLayers:
   - Default
   m_MigratedRenderPipelines: []

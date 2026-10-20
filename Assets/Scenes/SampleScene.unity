@@ -146,7 +146,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 3.4, y: 3.4, z: 3.4}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1015086062}
@@ -200,8 +200,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Color: {r: 1, g: 0.41960785, b: 0.41960785, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -425,6 +425,9 @@ MonoBehaviour:
   maxHealth: 50
   hitInvincibilityDuration: 0
   dashInvincibilityTime: 0.25
+  startReductionThreshold: 0.5
+  maxReductionThreshold: 0.1
+  maxDamageReduction: 0.5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,7 +469,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000i
+  m_ApplyToSortingLayers: 00000000add1932fabe4c14d011a495ed9c692d1i
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -571,6 +574,7 @@ GameObject:
   - component: {fileID: 1015086062}
   - component: {fileID: 1015086061}
   - component: {fileID: 1015086060}
+  - component: {fileID: 1015086063}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -597,7 +601,7 @@ MonoBehaviour:
   stunLength: 0.5
   moveSpeed: 1.5
   spriteRenderer: {fileID: 0}
-  baseColor: {r: 1, g: 0, b: 0, a: 1}
+  baseColor: {r: 1, g: 0.41960785, b: 0.41960785, a: 1}
   deathColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   deathParticlePrefab: {fileID: 0}
 --- !u!114 &1015086061
@@ -632,6 +636,19 @@ Transform:
   - {fileID: 404996770}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!210 &1015086063
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015086059}
+  m_Enabled: 1
+  m_SortingLayerID: 798216621
+  m_SortingLayer: 2
+  m_SortingOrder: 0
+  m_SortAtRoot: 0
+  m_Sort3DAs2D: 0
 --- !u!1 &1161810833
 GameObject:
   m_ObjectHideFlags: 0
@@ -1102,9 +1119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c313e2f7cbe5df642a81dcc85f2cf415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  pools:
-  - prefab: {fileID: 0}
-    pregenCount: 0
+  pools: []
 --- !u!1001 &396686139739025095
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1321,6 +1336,10 @@ PrefabInstance:
       propertyPath: ghostHoldTime
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6432603234594427735, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 1581849089
+      objectReference: {fileID: 0}
     - target: {fileID: 6536591138732842647, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1344,6 +1363,14 @@ PrefabInstance:
     - target: {fileID: 7327046056284075103, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: smoothSpeed
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7327046056284075103, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: maxAmplitude
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7327046056284075103, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: heightMultiplier
+      value: 122500
       objectReference: {fileID: 0}
     - target: {fileID: 7327046056284075103, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: ceilingRegenSpeed
