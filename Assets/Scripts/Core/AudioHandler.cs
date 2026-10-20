@@ -32,11 +32,15 @@ namespace ImPulse.Core
 
         public event Action OnSongStart;
         
-        // Fired on every whole beat
+        // Fired on every beat regardless of pattern
         public event Action<int> OnBeat;
-        
-        // Fired on every half beat 
         public event Action<int> OnHalfBeat;
+        public event Action<int> OnQuarterBeat;
+
+        // Fired only when a beat aligns with a 'true' value in the currentPattern array at the chosen resolution
+        public event Action<int> OnWholePatternBeat;
+        public event Action<int> OnHalfPatternBeat;
+        public event Action<int> OnQuarterPatternBeat;
 
         private AudioSource _audioSource;
         private double _dspSongStartTime;
@@ -45,6 +49,7 @@ namespace ImPulse.Core
         private bool _hasSongStarted = false;
         private int _nextBeatIndex = 0;
         private int _nextHalfBeatIndex = 0;
+        private int _nextQuarterBeatIndex = 0;
 
         void Awake()
         {
@@ -52,7 +57,6 @@ namespace ImPulse.Core
             _audioSource.clip = trackClip;
             _audioSource.pitch = playbackSpeed; 
 
-            // Adjust the actual BPM mathematically based on the playback speed.
             bpm = bpm * playbackSpeed;
 
             _secPerBeat = 60.0 / bpm;
@@ -63,8 +67,6 @@ namespace ImPulse.Core
 
         void Update()
         {
-            // Because our BPM is already scaled, we use pure real-world elapsed time here.
-            // (No double-multiplying by playbackSpeed!)
             songPositionInSeconds = AudioSettings.dspTime - _dspSongStartTime;
             songPositionInBeats = songPositionInSeconds / _secPerBeat;
 
@@ -79,13 +81,45 @@ namespace ImPulse.Core
                 while (songPositionInBeats >= _nextBeatIndex)
                 {
                     OnBeat?.Invoke(_nextBeatIndex);
+                    EvaluatePattern(_nextBeatIndex, PatternResolution.Whole);
                     _nextBeatIndex++;
                 }
 
                 while (songPositionInBeats >= _nextHalfBeatIndex * 0.5)
                 {
                     OnHalfBeat?.Invoke(_nextHalfBeatIndex);
+                    EvaluatePattern(_nextHalfBeatIndex, PatternResolution.Half);
                     _nextHalfBeatIndex++;
+                }
+
+                while (songPositionInBeats >= _nextQuarterBeatIndex * 0.25)
+                {
+                    OnQuarterBeat?.Invoke(_nextQuarterBeatIndex);
+                    EvaluatePattern(_nextQuarterBeatIndex, PatternResolution.Quarter);
+                    _nextQuarterBeatIndex++;
+                }
+            }
+        }
+
+        private void EvaluatePattern(int beatIndex, PatternResolution resolution)
+        {
+            if (patternResolution == resolution && currentPattern != null && currentPattern.Length > 0)
+            {
+                int stepIndex = beatIndex % currentPattern.Length;
+                if (currentPattern[stepIndex])
+                {
+                    switch (resolution)
+                    {
+                        case PatternResolution.Whole: 
+                            OnWholePatternBeat?.Invoke(beatIndex); 
+                            break;
+                        case PatternResolution.Half: 
+                            OnHalfPatternBeat?.Invoke(beatIndex); 
+                            break;
+                        case PatternResolution.Quarter: 
+                            OnQuarterPatternBeat?.Invoke(beatIndex); 
+                            break;
+                    }
                 }
             }
         }

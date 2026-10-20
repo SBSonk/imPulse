@@ -11,7 +11,8 @@ namespace ImPulse.Player
         Idle,
         Moving,
         Dashing, 
-        InAttack
+        InAttack,
+        Stunned
     }
 
     [RequireComponent(typeof(PlayerInput))]
@@ -28,15 +29,24 @@ namespace ImPulse.Player
         [SerializeField] float dashDuration = 0.4f;
         [SerializeField] EaseType dashEaseType = EaseType.OutQuad;
 
+        [Header("Stamina Settings")]
+        [SerializeField] float maxStamina = 3.0f;
+        [SerializeField] float staminaRegenRate = 1.0f;
+        [SerializeField] float dashStaminaCost = 1.0f;
+
         [Header("Attack Movement Settings")]
         [SerializeField] float attackControlRegenDuration = 0.4f;
         [SerializeField] EaseType attackEaseType = EaseType.InQuad;
+
+        [Header("Knockback Settings")]
+        [SerializeField] EaseType knockbackEaseType = EaseType.OutCubic;
 
         [Header("State")]
         [SerializeField] MovementState _currentState = MovementState.Idle;
         [SerializeField] Vector3 _currentVelocity;
 
         RhythmInputHandler _rhythmInputHandler;
+        PlayerStatus _playerStatus;
 
         public Action OnDashStart;
 
@@ -44,8 +54,14 @@ namespace ImPulse.Player
         private Vector3 _dashDirection;
         private float _dashTimer;
         
+        private float _currentStamina;
+        
         private Vector3 _attackStartVelocity;
         private float _attackTimer;
+
+        private Vector3 _knockbackStartVelocity;
+        private float _stunDuration;
+        private float _stunTimer;
 
         private bool _dashTriggered;
         private bool _hasStateControl = true;
@@ -53,10 +69,18 @@ namespace ImPulse.Player
         void Start()
         {
             _rhythmInputHandler = FindAnyObjectByType<RhythmInputHandler>();
+            _playerStatus = GetComponent<PlayerStatus>();
+            _currentStamina = maxStamina;
         }
 
         private void Update()
         {
+            // Constantly regenerate stamina up to the max
+            if (_currentStamina < maxStamina)
+            {
+                _currentStamina = Mathf.Clamp(_currentStamina + staminaRegenRate * Time.deltaTime, 0f, maxStamina);
+            }
+
             UpdateStateTransitions();
             ExecuteCurrentState();
 
@@ -73,9 +97,12 @@ namespace ImPulse.Player
 
         public void OnDash(InputValue value)
         {
-            if (value.isPressed && _currentInputDirection.sqrMagnitude > 0.01f)
+            if (value.isPressed && _currentInputDirection.sqrMagnitude > 0.01f && _currentState != MovementState.Stunned)
             {
-                _dashTriggered = true;
+                if (_currentStamina >= dashStaminaCost)
+                {
+                    _dashTriggered = true;
+                }
             }
         }
 
@@ -149,7 +176,6 @@ namespace ImPulse.Player
                     float attackEase = Easing.Evaluate(attackEaseType, attackNormTime);
 
                     Vector3 frozenVelocity = Vector3.Lerp(_attackStartVelocity, Vector3.zero, attackEase);
-                    
                     Vector3 inputTargetVelocity = _currentInputDirection * moveSpeed;
 
                     _currentVelocity = Vector3.Lerp(frozenVelocity, inputTargetVelocity, attackEase);
@@ -157,6 +183,23 @@ namespace ImPulse.Player
                     if (_currentInputDirection.sqrMagnitude > 0.01f && attackEase > .9f)
                     {
                         FaceMoveDirection(_currentInputDirection);
+                    }
+                    break;
+
+                case MovementState.Stunned:
+                    _stunTimer += Time.deltaTime;
+
+                    float stunNormTime = Mathf.Clamp01(_stunTimer / _stunDuration);
+                    float stunEase = Easing.Evaluate(knockbackEaseType, stunNormTime);
+
+                    Vector3 baseVelocity = _currentInputDirection * moveSpeed;
+                    
+                    _currentVelocity = Vector3.Lerp(_knockbackStartVelocity, baseVelocity, stunEase);
+
+                    if (_stunTimer >= _stunDuration)
+                    {
+                        _hasStateControl = true;
+                        _currentState = _currentInputDirection.sqrMagnitude > 0.01f ? MovementState.Moving : MovementState.Idle;
                     }
                     break;
             }
@@ -175,10 +218,21 @@ namespace ImPulse.Player
             _currentState = MovementState.Dashing;
             _dashTimer = 0f;
             _dashDirection = _currentInputDirection;
+            
+            // Deduct the required stamina cost
+            _currentStamina -= dashStaminaCost;
+
+            if (_playerStatus != null)
+            {
+                _playerStatus.GrantInvincibility(dashDuration);
+            }
 
             OnDashStart?.Invoke();
 
-            _rhythmInputHandler.ProcessInput();
+            if (_rhythmInputHandler != null)
+            {
+                _rhythmInputHandler.ProcessInput();
+            }
         }
 
         void ApplyFriction(float friction)
@@ -202,7 +256,6 @@ namespace ImPulse.Player
             _currentVelocity *= newSpeed;
         }
 
-        // funny quake accel
         void Accelerate(Vector3 wishDir, float wishSpeed, float accel)
         {
             float currentSpeed = Vector3.Dot(_currentVelocity, wishDir);
@@ -220,6 +273,20 @@ namespace ImPulse.Player
             _currentVelocity += wishDir * accelAmount;
         }
 
+        public void ApplyKnockback(Vector3 direction, float force, float duration)
+        {
+            if (_currentState == MovementState.Dashing) return; 
+
+            _currentState = MovementState.Stunned;
+            _hasStateControl = false;
+            
+            _knockbackStartVelocity = direction.normalized * force;
+            _stunDuration = duration;
+            _stunTimer = 0f;
+
+            if (_currentState == MovementState.InAttack) FreeAttackState();
+        }
+
         public void EnterAttackState()
         {
             _currentState = MovementState.InAttack;
@@ -234,5 +301,10 @@ namespace ImPulse.Player
             _hasStateControl = true;
             _currentState = MovementState.Idle; 
         }
+        
+        public float GetCurrentStamina() => _currentStamina;
+        public float GetMaxStamina() => maxStamina;
+
+        public Vector3 GetVelocity() => _currentVelocity;
     }
 }

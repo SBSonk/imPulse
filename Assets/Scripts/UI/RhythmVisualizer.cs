@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ImPulse.Core;
 using ImPulse.Helpers;
 
-namespace ImPulse.Rhythm
+namespace ImPulse.UI
 {
     public class VisualNode
     {
