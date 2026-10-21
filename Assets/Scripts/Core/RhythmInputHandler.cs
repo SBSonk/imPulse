@@ -8,31 +8,37 @@ namespace ImPulse.Core
         [Header("References")]
         public AudioHandler audioHandler;
 
+        [Header("Combo Settings")]
+        public int maxCombo = 4;
+        public int CurrentCombo { get; private set; } = 0;
+        
+        // Expose the finisher state so other scripts don't have to calculate it
+        public bool IsFinisher => CurrentCombo == maxCombo && maxCombo > 0;
+
         [Header("Timing Settings")]
         public double forgivenessWindow = 0.100;
 
-        // Generic events (Visualizer can still use these for hit feedback)
+        // Combo Events for UI
+        public event Action OnComboAdvanced;
+        public event Action OnComboDropped;
+
+        // Generic events
         public event Action<int, string> OnInputSuccess;
         public event Action OnInputMiss;
 
         private int _lastHitStepIndex = -1;
 
-        /// <summary>
-        /// Evaluates the current input against the metronome.
-        /// Returns true if it was a valid hit, false if it missed or was spammed.
-        /// </summary>
         public bool ProcessInput()
         {
             if (audioHandler == null || audioHandler.currentPattern == null || audioHandler.currentPattern.Length == 0) 
             {
-                OnInputMiss?.Invoke();
+                TriggerMiss();
                 return false;
             }
 
             double currentPositionSec = audioHandler.songPositionInSeconds;
             double secPerBeat = 60.0 / audioHandler.bpm;
 
-            // Determine the subdivision step size
             double stepSize = 1.0;
             switch (audioHandler.patternResolution)
             {
@@ -47,7 +53,6 @@ namespace ImPulse.Core
             int bestStep = -1;
             double smallestDiff = double.MaxValue;
 
-            // Search a small radius to find the absolute closest ACTIVE step
             for (int i = -2; i <= 2; i++)
             {
                 int checkStep = centerStep + i;
@@ -65,22 +70,27 @@ namespace ImPulse.Core
                 }
             }
 
-            // 1. Check if completely off-beat
             if (bestStep == -1 || smallestDiff > forgivenessWindow)
             {
-                OnInputMiss?.Invoke();
+                TriggerMiss();
                 return false;
             }
 
-            // 2. Check if the player is spamming the exact same note
             if (bestStep == _lastHitStepIndex)
             {
-                OnInputMiss?.Invoke();
+                TriggerMiss();
                 return false; 
             }
 
-            // 3. Valid Hit successfully registered
             _lastHitStepIndex = bestStep;
+
+            if (CurrentCombo >= maxCombo)
+            {
+                CurrentCombo = 0; 
+            }
+            
+            CurrentCombo++;
+            OnComboAdvanced?.Invoke();
 
             double bestStepTime = bestStep * secPerStep;
             double timingDifference = currentPositionSec - bestStepTime;
@@ -93,14 +103,26 @@ namespace ImPulse.Core
             return true;
         }
 
+        private void TriggerMiss()
+        {
+            DropCombo();
+            OnInputMiss?.Invoke();
+        }
+
+        public void DropCombo()
+        {
+            if (CurrentCombo > 0)
+            {
+                CurrentCombo = 0;
+                OnComboDropped?.Invoke();
+            }
+        }
+
         private bool IsStepActive(int stepIndex)
         {
             int length = audioHandler.currentPattern.Length;
             int mod = stepIndex % length;
-            
-            // Fix modulo math for negative indices so the pre-song count-in parses correctly
             if (mod < 0) mod += length; 
-            
             return audioHandler.currentPattern[mod];
         }
     }

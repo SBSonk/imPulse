@@ -20,8 +20,10 @@ namespace ImPulse.Player
         public Weapon equippedRangedWeapon;
 
         [Header("Timing Windows")]
-        public float comboWindow = 1.0f;
-        public float attackCancelTime = 0.5f;
+        [Tooltip("How long before the player can input the next attack to continue the combo.")]
+        public float attackCancelTime = 0.3f;
+        [Tooltip("How long the attack state actually lasts before movement is naturally restored.")]
+        public float attackDuration = 0.6f;
 
         [SerializeField] Transform bulletOrigin;
 
@@ -30,12 +32,11 @@ namespace ImPulse.Player
 
         Animator _animator;
         PlayerMovement _playerMovement;
-        AudioHandler _audioHandler;
         RhythmInputHandler _rhythmInputHandler;
+        HasHealth _playerHealth;
 
-        int _currentAttackIndex = 0;
         float _timeSinceLastAttack = 0f;
-        bool _comboFinished = false;
+        float _lastHealthAmount;
 
         void Awake()
         {
@@ -47,24 +48,23 @@ namespace ImPulse.Player
                 _playerMovement.OnDashStart += CancelAttack;
             }
 
-            _audioHandler = FindAnyObjectByType<AudioHandler>();
             _rhythmInputHandler = FindAnyObjectByType<RhythmInputHandler>();
         }
 
         void Start()
         {
-            if (_audioHandler != null)
+            _playerHealth = GetComponent<HasHealth>();
+            if (_playerHealth != null)
             {
-                comboWindow = _audioHandler.GetSecondsPerBeat();
+                _lastHealthAmount = _playerHealth.currentHealth;
+                _playerHealth.OnHealthChanged += HandleHealthChanged;
             }
         }
 
         void OnDestroy()
         {
-            if (_playerMovement != null)
-            {
-                _playerMovement.OnDashStart -= CancelAttack;
-            }
+            if (_playerMovement != null) _playerMovement.OnDashStart -= CancelAttack;
+            if (_playerHealth != null) _playerHealth.OnHealthChanged -= HandleHealthChanged;
         }
 
         private void Update()
@@ -73,29 +73,32 @@ namespace ImPulse.Player
             UpdateStateTransitions();
         }
 
+        private void HandleHealthChanged(float currentHealth, float maxHealth)
+        {
+            if (currentHealth < _lastHealthAmount)
+            {
+                if (_rhythmInputHandler != null) _rhythmInputHandler.DropCombo();
+            }
+            _lastHealthAmount = currentHealth;
+        }
+
         private void UpdateStateTransitions()
         {
             if (_currentState == AttackState.Idle || _currentState == AttackState.Special) return;
 
-            if (_timeSinceLastAttack > attackCancelTime + comboWindow)
+            // Only return to idle (and free movement) when the full attack animation duration has passed
+            if (_timeSinceLastAttack > attackDuration)
             {
-                ReturnToIdle();
+                ReturnToIdle(); 
             }
         }
-
-        #region Input Triggers
 
         public void OnMeleeAttack(InputValue value)
         {
             if (value.isPressed && CanAttack())
             {
                 bool isOnBeat = false;
-                if (_rhythmInputHandler != null)
-                {
-                    isOnBeat = _rhythmInputHandler.ProcessInput();
-                    if (!isOnBeat) ResetCombo();
-                }
-
+                if (_rhythmInputHandler != null) isOnBeat = _rhythmInputHandler.ProcessInput();
                 ExecuteAttack(isRanged: false, isOnBeat);
             } 
         }
@@ -105,95 +108,61 @@ namespace ImPulse.Player
             if (value.isPressed && CanAttack())
             {
                 bool isOnBeat = false;
-                if (_rhythmInputHandler != null)
-                {
-                    isOnBeat = _rhythmInputHandler.ProcessInput();
-                    if (!isOnBeat) ResetCombo();
-                }
-
+                if (_rhythmInputHandler != null) isOnBeat = _rhythmInputHandler.ProcessInput();
                 ExecuteAttack(isRanged: true, isOnBeat);
             }
         }
 
-        #endregion
-
         bool CanAttack() 
         {
             if (_currentState == AttackState.Idle) return true;
+            
+            // Allow the player to override the current attack early to continue the combo
             return _timeSinceLastAttack >= attackCancelTime;
         }
 
         private void ExecuteAttack(bool isRanged, bool isOnBeat)
         {
-            if (_currentState == AttackState.Special) return;
+            if (_currentState == AttackState.Special || _rhythmInputHandler == null) return;
 
-            // Cast to your specific weapon classes to access the animation strings you moved
+            bool isFinisher = _rhythmInputHandler.IsFinisher;
+            int attackIndex = Mathf.Max(0, _rhythmInputHandler.CurrentCombo - 1);
+
             MeleeWeapon meleeWeapon = equippedMeleeWeapon as MeleeWeapon;
             RangedWeapon rangedWeapon = equippedRangedWeapon as RangedWeapon;
-
-            // The melee weapon still dictates the universal max combo length
-            int maxComboLength = 0;
-            if (meleeWeapon != null && meleeWeapon.comboAnimations != null)
-            {
-                maxComboLength = meleeWeapon.comboAnimations.Length;
-            }
-
-            if (maxComboLength == 0) return;
-
-            if (_comboFinished)
-            {
-                ResetCombo();
-            }
-
             string animToPlay = "";
+
             if (isRanged)
             {
                 if (rangedWeapon != null)
                 {
-                    if (_currentAttackIndex == maxComboLength - 1) animToPlay = rangedWeapon.finisherAnimation;
-                    else animToPlay = rangedWeapon.fireAnimation;
+                    animToPlay = isFinisher ? rangedWeapon.finisherAnimation : rangedWeapon.fireAnimation;
                 }
             }
             else 
             {
-                if (meleeWeapon != null)
+                if (meleeWeapon != null && meleeWeapon.comboAnimations != null && meleeWeapon.comboAnimations.Length > 0)
                 {
-                    animToPlay = meleeWeapon.comboAnimations[_currentAttackIndex];
+                    animToPlay = isFinisher ? meleeWeapon.finisherAnimation : meleeWeapon.comboAnimations[attackIndex % meleeWeapon.comboAnimations.Length];
                 }
             }
 
             if (isRanged && equippedRangedWeapon != null)
             {
-                if (_currentAttackIndex == maxComboLength - 1) 
-                    equippedRangedWeapon.OnFinisher(transform, _currentState, isOnBeat);
-                else 
-                    equippedRangedWeapon.OnAttack(transform, _currentState, _currentAttackIndex, isOnBeat);
+                if (isFinisher) equippedRangedWeapon.OnFinisher(transform, _currentState, isOnBeat);
+                else equippedRangedWeapon.OnAttack(transform, _currentState, attackIndex, isOnBeat);
             }
             else if (!isRanged && equippedMeleeWeapon != null)
             {
-                if (_currentAttackIndex == maxComboLength - 1) 
-                    equippedMeleeWeapon.OnFinisher(transform, _currentState, isOnBeat);
-                else 
-                    equippedMeleeWeapon.OnAttack(transform, _currentState, _currentAttackIndex, isOnBeat);
+                if (isFinisher) equippedMeleeWeapon.OnFinisher(transform, _currentState, isOnBeat);
+                else equippedMeleeWeapon.OnAttack(transform, _currentState, attackIndex, isOnBeat);
             }
-
-            _currentAttackIndex++;
-
-            if (_currentAttackIndex >= maxComboLength) _comboFinished = true;
-            else _comboFinished = false;
 
             _currentState = isRanged ? AttackState.Ranged : AttackState.Melee;
             _timeSinceLastAttack = 0f; 
 
-            if (_playerMovement != null)
-            {
-                _playerMovement.EnterAttackState();
-            }
-
-            if (_animator != null && !string.IsNullOrEmpty(animToPlay))
-            {
-                _animator.Play(animToPlay, 0, 0f);
-            }
+            if (_playerMovement != null) _playerMovement.EnterAttackState();
+            if (_animator != null && !string.IsNullOrEmpty(animToPlay)) _animator.Play(animToPlay, 0, 0f);
         }
 
         public void ExecuteSpecialSleight(string sleightAnimation)
@@ -202,43 +171,26 @@ namespace ImPulse.Player
             _timeSinceLastAttack = 0f;
 
             if (_playerMovement != null) _playerMovement.EnterAttackState();
+            if (_animator != null) _animator.Play(sleightAnimation, 0, 0f);
 
-            if (_animator != null)
-            {
-                _animator.Play(sleightAnimation, 0, 0f);
-            }
-
-            ResetCombo();
-        }
-
-        public void ResetCombo()
-        {
-            if (_currentAttackIndex != 0 || _comboFinished)
-            {
-                _currentAttackIndex = 0;
-                _comboFinished = false;
-            }
+            if (_rhythmInputHandler != null) _rhythmInputHandler.DropCombo();
         }
 
         public void CancelAttack()
         {
             if (_currentState == AttackState.Idle || _currentState == AttackState.Special) return;
-
             _currentState = AttackState.Idle;
             _animator.Play("Idle");
-            _comboFinished = true;
+            
+            // Explicitly free movement if cancelled by a dash
+            if (_playerMovement != null) _playerMovement.FreeAttackState();
         }
 
         private void ReturnToIdle()
         {
             _currentState = AttackState.Idle;
             _timeSinceLastAttack = 0f;
-            ResetCombo();
-            
-            if (_playerMovement != null)
-            {
-                _playerMovement.FreeAttackState();
-            }
+            if (_playerMovement != null) _playerMovement.FreeAttackState();
         }
 
         public Transform GetBulletOrigin() => bulletOrigin;

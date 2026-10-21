@@ -11,6 +11,7 @@ namespace ImPulse.Weapons
         
         [Header("Animations")]
         public string[] comboAnimations;
+        public string finisherAnimation;
         
         public CollisionLayerMask enemyLayer;
         

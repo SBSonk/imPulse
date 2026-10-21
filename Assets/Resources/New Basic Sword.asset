@@ -17,6 +17,6 @@ MonoBehaviour:
   hitRadius: 1.5
   comboAnimations:
   - SwordSwing1
-  - SwordSwing2
   - SwordSwing3
+  finisherAnimation: SwordSwing2
   enemyLayer: 0

@@ -299,7 +299,7 @@ namespace ImPulse.Player
         public void FreeAttackState()
         {
             _hasStateControl = true;
-            _currentState = MovementState.Idle; 
+            //_currentState = MovementState.Idle; 
         }
         
         public float GetCurrentStamina() => _currentStamina;
