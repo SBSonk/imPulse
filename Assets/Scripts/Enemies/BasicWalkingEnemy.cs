@@ -10,8 +10,6 @@ namespace ImPulse.Enemies
     {
         [Header("Visuals")]
         public SpriteRenderer spriteRenderer;
-        public Color baseColor = Color.white;
-        public Color deathColor = Color.gray;
         
         [Header("VFX")]
         public GameObject deathParticlePrefab;
@@ -21,15 +19,6 @@ namespace ImPulse.Enemies
             base.Awake();
             
             if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (spriteRenderer != null) spriteRenderer.color = baseColor;
-        }
-
-        void OnValidate()
-        {
-            if (GetComponentInChildren<SpriteRenderer>() != null)
-            {
-                GetComponentInChildren<SpriteRenderer>().color = baseColor;
-            }
         }
 
         protected override void HandleMovement()
@@ -52,7 +41,7 @@ namespace ImPulse.Enemies
             }
             else
             {
-                // Regain standard movement once the stun timer reaches 0[cite: 10]
+                // Regain standard movement once the stun timer reaches 0
                 Vector3 direction = (_playerTransform.position - transform.position).normalized;
                 transform.position += direction * moveSpeed * Time.deltaTime;
             }
@@ -62,32 +51,17 @@ namespace ImPulse.Enemies
         {
             if (_isDead) return;
             
-            _isDead = true;
-
-            if (spriteRenderer != null)
+            if (ObjectPooler.Instance != null && deathParticlePrefab != null)
             {
-                spriteRenderer.color = deathColor;
+                ObjectPooler.Instance.Get(deathParticlePrefab, transform.position, Quaternion.identity);
             }
 
             if (_collider != null)
             {
                 _collider.enabled = false;
             }
-        }
 
-        protected override void OnBeat(int beatIndex)
-        {
-            base.OnBeat(beatIndex);
-
-            if (_isDead)
-            {
-                if (ObjectPooler.Instance != null && deathParticlePrefab != null)
-                {
-                    ObjectPooler.Instance.Get(deathParticlePrefab, transform.position, Quaternion.identity);
-                }
-                
-                base.Die(); 
-            }
+            base.Die(); 
         }
 
         protected override void CollisionEnter(CustomCollider other)

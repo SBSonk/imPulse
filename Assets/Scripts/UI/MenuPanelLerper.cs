@@ -16,7 +16,7 @@ namespace ImPulse.UI
 
         private RectTransform _rectTransform;
         
-        private bool _isOn = false;
+        [SerializeField] bool _isOn = false;
         private bool _isAnimating = false;
         
         private float _animationTimer = 0f;
@@ -26,15 +26,14 @@ namespace ImPulse.UI
         private void Awake()
         {
             _rectTransform = GetComponent<RectTransform>();
-            
-            _rectTransform.anchoredPosition = offPosition;
+            _rectTransform.anchoredPosition = _isOn ? onPosition : offPosition;
         }
 
         private void Update()
         {
             if (!_isAnimating) return;
 
-            _animationTimer += Time.deltaTime;
+            _animationTimer += Time.unscaledDeltaTime; 
             float normTime = Mathf.Clamp01(_animationTimer / transitionDuration);
             float easeVal = Easing.Evaluate(transitionEase, normTime);
 

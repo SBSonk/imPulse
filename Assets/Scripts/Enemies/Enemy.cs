@@ -1,12 +1,16 @@
 using UnityEngine;
 using ImPulse.Core;
 using ImPulse.Helpers;
+using ImPulse.Core.Pooling;
+using System;
 
 namespace ImPulse.Enemies
 {
     [RequireComponent(typeof(CustomCollider))]
-    public abstract class Enemy : HasHealth 
+    public abstract class Enemy : HasHealth, IPoolable 
     {
+        public event Action<Enemy, int> OnEnemyDied;
+
         [Header("Attack Stats")]
         [SerializeField] protected float damage = 10;
         [SerializeField] protected float knockbackStrength = 5;
@@ -25,6 +29,9 @@ namespace ImPulse.Enemies
         protected CustomCollider _collider;
         protected AudioHandler _audioHandler;
         protected Transform _playerTransform;
+        
+        protected GameObject _sourcePrefab;
+        private int _xpYield = 0;
 
         protected override void Awake()
         {
@@ -37,6 +44,24 @@ namespace ImPulse.Enemies
             {
                 _playerTransform = CustomCollider.LayerGroups[(int)CollisionLayer.Player][0].transform;
             }
+        }
+
+        public void InitializeWaveStats(float healthMultiplier, int xpYield)
+        {
+            maxHealth *= healthMultiplier;
+            currentHealth = maxHealth;
+            _xpYield = xpYield;
+        }
+        
+        public virtual void OnPoolGet(GameObject sourcePrefab)
+        {
+            _sourcePrefab = sourcePrefab;
+        }
+
+        public virtual void OnPoolReturn()
+        {
+            _knockbackVelocity = Vector3.zero;
+            _stunTimer = 0f;
         }
 
         protected virtual void OnEnable()
@@ -53,6 +78,9 @@ namespace ImPulse.Enemies
                 _audioHandler.OnBeat += OnBeat;
                 _audioHandler.OnHalfBeat += OnHalfBeat;
             }
+            
+            _isDead = false;
+            if (_collider != null) _collider.enabled = true;
         }
 
         protected virtual void OnDisable()
@@ -112,7 +140,17 @@ namespace ImPulse.Enemies
             if (_isDead) return;
             
             base.Die(); 
-            Destroy(gameObject);
+            
+            OnEnemyDied?.Invoke(this, _xpYield);
+            
+            if (ObjectPooler.Instance != null && _sourcePrefab != null)
+            {
+                ObjectPooler.Instance.Return(_sourcePrefab, gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

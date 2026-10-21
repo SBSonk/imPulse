@@ -46,11 +46,11 @@ namespace ImPulse.UI
         {
             if (_isMouseOver)
             {
-                _hoverTime += Time.deltaTime;
+                _hoverTime += Time.unscaledDeltaTime;
             }
             else
             {
-                _hoverTime -= Time.deltaTime;
+                _hoverTime -= Time.unscaledDeltaTime;
             }
 
             _hoverTime = Mathf.Clamp(_hoverTime, 0, maxHoverTime);
@@ -62,5 +62,4 @@ namespace ImPulse.UI
             _rectTransform.localScale = Vector3.Lerp(_startLocalScale, maxScale, Easing.Evaluate(ease, t));
         }
     }
-
 }

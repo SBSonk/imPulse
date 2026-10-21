@@ -22,6 +22,10 @@ namespace ImPulse.Core
         [Range(0.1f, 3f)]
         public float playbackSpeed = 1f;
 
+        [Header("Audio Settings")]
+        [Tooltip("How fast the volume lerps to the target value (units per second).")]
+        public float volumeFadeSpeed = 2f;
+
         [Header("Rhythm Pattern")]
         public PatternResolution patternResolution = PatternResolution.Whole;
         public bool[] currentPattern = { true, false, true, false };
@@ -52,16 +56,15 @@ namespace ImPulse.Core
         private int _nextHalfBeatIndex = 0;
         private int _nextQuarterBeatIndex = 0;
 
+        private float _targetVolume;
+
         void Awake()
         {
             _audioSource = GetComponent<AudioSource>();
             _audioSource.clip = trackClip;
+            _targetVolume = _audioSource.volume;
             
-            // Store the initial BPM before any modifiers are applied
             _baseBpm = bpm; 
-
-            // Initialize audio using the new update function
-            SetPlaybackSpeed(playbackSpeed);
 
             _dspSongStartTime = AudioSettings.dspTime + startOffset;
             _audioSource.PlayScheduled(_dspSongStartTime);
@@ -69,6 +72,12 @@ namespace ImPulse.Core
 
         void Update()
         {
+            // Handle gradual volume lerping using unscaled time (immune to slow-motion)
+            if (!Mathf.Approximately(_audioSource.volume, _targetVolume))
+            {
+                _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _targetVolume, Time.unscaledDeltaTime * volumeFadeSpeed);
+            }
+
             songPositionInSeconds = AudioSettings.dspTime - _dspSongStartTime;
             songPositionInBeats = songPositionInSeconds / _secPerBeat;
 
@@ -124,6 +133,14 @@ namespace ImPulse.Core
             {
                 _dspSongStartTime = AudioSettings.dspTime - (songPositionInBeats * _secPerBeat);
             }
+        }
+
+        /// <summary>
+        /// Sets the target volume. The audio source will gradually lerp to this value in Update.
+        /// </summary>
+        public void SetVolume(float newVolume)
+        {
+            _targetVolume = Mathf.Clamp01(newVolume);
         }
 
         private void EvaluatePattern(int beatIndex, PatternResolution resolution)
