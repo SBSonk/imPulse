@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ImPulse.Helpers;
-using UnityEngine.AI;
-using Unity.VisualScripting;
 
 namespace ImPulse.Core
 {
@@ -53,7 +51,6 @@ namespace ImPulse.Core
         {
             if (LayerGroups == null)
             {
-                // initialize layer lookups
                 int layerCount = Enum.GetValues(typeof(CollisionLayer)).Length;
                 LayerGroups = new List<CustomCollider>[layerCount];
                 for (int i = 0; i < layerCount; i++) LayerGroups[i] = new List<CustomCollider>();
@@ -81,7 +78,6 @@ namespace ImPulse.Core
         {
             if (layersToCheck == CollisionLayerMask.None) return;
 
-            // collision pass
             for (int i = 0; i < LayerGroups.Length; i++)
             {
                 if (((int)layersToCheck & (1 << i)) != 0)
@@ -104,7 +100,6 @@ namespace ImPulse.Core
                 }
             }
 
-            // pass to remove collisions that ended
             if (_activeCollisions.Count > 0)
             {
                 _exitBuffer.Clear();
@@ -139,6 +134,22 @@ namespace ImPulse.Core
                 return CollisionHelper.BoxToCircle(a.transform.position, a.radius, b.transform.position, b.radius);
 
             return CollisionHelper.BoxToCircle(b.transform.position, b.radius, a.transform.position, a.radius);
+        }
+
+        public static List<CustomCollider> GetColliders(CollisionLayerMask mask)
+        {
+            List<CustomCollider> colliders = new List<CustomCollider>();
+            if (LayerGroups == null) return colliders;
+
+            for (int i = 0; i < LayerGroups.Length; i++)
+            {
+                if (((int)mask & (1 << i)) != 0)
+                {
+                    colliders.AddRange(LayerGroups[i]);
+                }
+            }
+
+            return colliders;
         }
 
         private void OnDrawGizmos()

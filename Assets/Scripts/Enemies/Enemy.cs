@@ -1,5 +1,6 @@
 using UnityEngine;
 using ImPulse.Core;
+using ImPulse.Helpers;
 
 namespace ImPulse.Enemies
 {
@@ -14,6 +15,13 @@ namespace ImPulse.Enemies
         [Header("Movement Stats")]
         [SerializeField] protected float moveSpeed = 3f;
 
+        [Header("Hit Reaction Settings")]
+        [SerializeField] protected EaseType knockbackEase = EaseType.OutQuad;
+        
+        protected Vector3 _knockbackVelocity;
+        protected float _stunTimer = 0f;
+        protected float _stunDuration = 0f;
+
         protected CustomCollider _collider;
         protected AudioHandler _audioHandler;
         protected Transform _playerTransform;
@@ -25,7 +33,6 @@ namespace ImPulse.Enemies
             _collider = GetComponent<CustomCollider>();
             _audioHandler = FindAnyObjectByType<AudioHandler>();
 
-            // theres only one player anyway
             if (CustomCollider.LayerGroups[(int)CollisionLayer.Player].Count > 0)
             {
                 _playerTransform = CustomCollider.LayerGroups[(int)CollisionLayer.Player][0].transform;
@@ -64,11 +71,14 @@ namespace ImPulse.Enemies
             }
         }
 
-
-
         protected override void Update()
         {
             base.Update();
+
+            if (_stunTimer > 0f)
+            {
+                _stunTimer -= Time.deltaTime;
+            }
 
             if (_playerTransform == null && CustomCollider.LayerGroups[(int)CollisionLayer.Player].Count > 0)
             {
@@ -78,6 +88,13 @@ namespace ImPulse.Enemies
 
             HandleMovement();
             HandleAttack();
+        }
+
+        public virtual void ApplyKnockback(Vector3 direction, float force, float duration)
+        {
+            _knockbackVelocity = direction.normalized * force;
+            _stunDuration = duration;
+            _stunTimer = duration;
         }
 
         protected virtual void HandleMovement() { }

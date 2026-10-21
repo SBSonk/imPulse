@@ -7,7 +7,12 @@ namespace ImPulse.Weapons
     {
         [Header("Core Weapon Stats")]
         public string weaponName = "New Weapon";
-        public float baseDamage = 10f;
+        
+        [Header("Damage Stats")]
+        public float damage = 10;
+        public float stunLength = .25f;
+        public float knockbackStrength = 5;
+        
 
         /// <summary>
         /// Called on every standard hit of the combo.

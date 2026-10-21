@@ -44,7 +44,7 @@ namespace ImPulse.Weapons
             
             if (projectile != null)
             {
-                projectile.InitializeProjectile(projectileSpeed, projectileDamage, lifeTime);
+                projectile.InitializeProjectile(projectileSpeed, damage, stunLength, knockbackStrength, lifeTime);
                 projectile.Fire(fireDirection);
             }
         }
@@ -83,7 +83,7 @@ namespace ImPulse.Weapons
             
             if (projectile != null)
             {
-                projectile.InitializeProjectile(speed, damage, lifeTime);
+                projectile.InitializeProjectile(speed, damage, stunLength, knockbackStrength, lifeTime);
                 projectile.Fire(direction);
             }
         }

@@ -9,6 +9,8 @@ namespace ImPulse.Weapons
         protected float _speed;
         protected float _damage;
         protected float _maxLifetime;
+        protected float _stunLength;
+        protected float _knockbackStrength;
 
         protected GameObject _sourcePrefab;
         protected Vector3 _direction;
@@ -47,12 +49,14 @@ namespace ImPulse.Weapons
             }
         }
 
-        public virtual void InitializeProjectile(float speed, float damage, float maxLifetime)
+        public virtual void InitializeProjectile(float speed, float damage, float stunLength, float knockback, float maxLifetime)
         {
             _speed = speed;
             _damage = damage;
             _maxLifetime = maxLifetime;
             _lifetimeTimer = _maxLifetime;
+            _stunLength = stunLength;
+            _knockbackStrength = knockback;
         }
 
         public virtual void Fire(Vector3 direction)

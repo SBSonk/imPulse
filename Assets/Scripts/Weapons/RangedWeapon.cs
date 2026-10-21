@@ -11,7 +11,6 @@ namespace ImPulse.Weapons
 
         [Header("Ranged Properties")]
         public GameObject projectilePrefab;
-        public float projectileDamage = 10f;
         public float projectileSpeed = 20f;
         public float maxRange = 15f;
         public float lifeTime = 5f;
