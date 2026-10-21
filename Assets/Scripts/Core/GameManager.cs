@@ -1,11 +1,12 @@
 using UnityEngine;
 using System;
-using UnityEditor.SettingsManagement;
 
 namespace ImPulse.Core
 {
     public class GameManager : MonoBehaviour
     {
+        public static GameManager Instance;
+
         private AudioHandler _audioHandler;
         
         [Range(0.1f, 2f)] public float normalTimescale = .8f, levelUpTimescale = .2f;
@@ -19,13 +20,24 @@ namespace ImPulse.Core
         public int xpToNextLevel = 100;
         public float xpScaleFactor = 1.5f;
 
+        [Header("Scoring")]
+        public int score = 0;
+
         // Events for UI
         public event Action<int, int> OnXPChanged;
+        public event Action<int> OnScoreChanged;
         public event Action<int> OnLevelUp;
 
         void Awake()
         {
+            if (!Instance) Instance = this;
+            else Destroy(gameObject);
             _audioHandler = FindAnyObjectByType<AudioHandler>();
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         void Start()
@@ -43,6 +55,13 @@ namespace ImPulse.Core
             {
                 TriggerLevelUp();
             }
+        }
+
+        public void AddScore(int amount)
+        {
+            score += amount;
+
+            OnScoreChanged?.Invoke(score);
         }
 
         private void TriggerLevelUp()

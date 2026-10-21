@@ -1,6 +1,7 @@
 using UnityEngine;
 using ImPulse.Core;
 using ImPulse.Player;
+using TMPro;
 
 namespace ImPulse.UI
 {
@@ -9,9 +10,16 @@ namespace ImPulse.UI
         [Header("References")]
         [SerializeField] private MaskedBar staminaBar;
         [SerializeField] private AudioVisualizerUI audioVisualizer;
+        [SerializeField] TextMeshProUGUI scoreText, roundText;
         
         PlayerStatus playerStatus;
         PlayerMovement playerMovement;
+
+        void Start()
+        {
+            GameManager.Instance.OnScoreChanged += HandleScoreChange;
+            EnemyWaveSpawner.Instance.OnRoundChange += HandleRoundChange;
+        }
 
         private void OnEnable()
         {
@@ -42,6 +50,9 @@ namespace ImPulse.UI
 
         private void OnDisable()
         {
+            GameManager.Instance.OnScoreChanged -= HandleScoreChange;
+            EnemyWaveSpawner.Instance.OnRoundChange -= HandleRoundChange;
+
             if (playerStatus != null)
             {
                 playerStatus.OnHealthChanged -= HandleHealthChanged;
@@ -59,6 +70,16 @@ namespace ImPulse.UI
                     staminaBar.SetFill(staminaRatio);
                 }
             }
+        }
+
+        void HandleScoreChange(int newScore)
+        {
+            scoreText.SetText(newScore.ToString("00000"));
+        }
+
+        void HandleRoundChange(int newRound)
+        {
+            roundText.SetText($"round {newRound}.");
         }
 
         private void HandleHealthChanged(float currentHealth, float maxHealth)

@@ -9,7 +9,7 @@ namespace ImPulse.Enemies
     [RequireComponent(typeof(CustomCollider))]
     public abstract class Enemy : HasHealth, IPoolable 
     {
-        public event Action<Enemy, int> OnEnemyDied;
+        public event Action<Enemy, int, int> OnEnemyDied;
 
         [Header("Attack Stats")]
         [SerializeField] protected float damage = 10;
@@ -31,7 +31,8 @@ namespace ImPulse.Enemies
         protected Transform _playerTransform;
         
         protected GameObject _sourcePrefab;
-        private int _xpYield = 0;
+        int _xpYield = 0;
+        int _scoreYield;
 
         protected override void Awake()
         {
@@ -46,11 +47,12 @@ namespace ImPulse.Enemies
             }
         }
 
-        public void InitializeWaveStats(float healthMultiplier, int xpYield)
+        public void InitializeWaveStats(float healthMultiplier, int xpYield, int scoreYield)
         {
             maxHealth *= healthMultiplier;
             currentHealth = maxHealth;
             _xpYield = xpYield;
+            _scoreYield = scoreYield;
         }
         
         public virtual void OnPoolGet(GameObject sourcePrefab)
@@ -141,7 +143,7 @@ namespace ImPulse.Enemies
             
             base.Die(); 
             
-            OnEnemyDied?.Invoke(this, _xpYield);
+            OnEnemyDied?.Invoke(this, _xpYield, _scoreYield);
             
             if (ObjectPooler.Instance != null && _sourcePrefab != null)
             {

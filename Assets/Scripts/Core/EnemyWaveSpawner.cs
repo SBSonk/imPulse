@@ -1,24 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ImPulse.Core.Pooling; // Assuming you are using an object pooler
+using ImPulse.Core.Pooling; 
 using ImPulse.Enemies;
 using ImPulse.Player;
-using UnityEngine.Rendering;
+using System;
 
 namespace ImPulse.Core
 {
     [System.Serializable]
     public struct EnemySpawnData
     {
-        public Enemy enemyPrefab; // Reference to the Enemy script on the prefab
-        [Tooltip("Higher value = higher chance to spawn.")]
+        public Enemy enemyPrefab;
         [Range(0, 100)] public float spawnWeight;
         public int xpYield;
+        public int scoreYield;
     }
 
     public class EnemyWaveSpawner : MonoBehaviour
     {
+        public static EnemyWaveSpawner Instance;
+
         [Header("Wave Configuration")]
         [SerializeField] private List<EnemySpawnData> enemyTypes;
         [SerializeField] private float timeBetweenWaves = 3f;
@@ -45,6 +47,8 @@ namespace ImPulse.Core
         [SerializeField] private int _enemiesCurrentlyAlive = 0;
         [SerializeField] private bool _isRoundActive = false;
 
+        public Action<int> OnRoundChange;
+
         GameManager _gameManager;
         Transform _playerTransform;
 
@@ -56,6 +60,17 @@ namespace ImPulse.Core
 
         private float _spawnTimer = 0f;
         private bool _isWaitingForNextRound = false;
+
+        void Awake()
+        {
+            if (!Instance) Instance = this;
+            else Destroy(gameObject);
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
 
         private void Start()
         {
@@ -91,6 +106,9 @@ namespace ImPulse.Core
         private void StartWave(int round)
         {
             currentRound = round;
+
+            OnRoundChange?.Invoke(round);
+
             _enemiesSpawnedThisRound = 0;
             
             ApplyRoundScaling();
@@ -124,7 +142,7 @@ namespace ImPulse.Core
             EnemySpawnData dataToSpawn = GetRandomEnemyType();
             
             // Random point on a 2D circle edge
-            Vector2 randomDir = Random.insideUnitCircle.normalized;
+            Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 spawnPos = _playerTransform.position + new Vector3(randomDir.x, randomDir.y, 0f) * spawnRadius;
 
             GameObject enemyObj = null;
@@ -141,7 +159,7 @@ namespace ImPulse.Core
             if (enemyScript != null)
             {
                 // Scale health and hook up the death event
-                enemyScript.InitializeWaveStats(_currentHealthModifier, dataToSpawn.xpYield);
+                enemyScript.InitializeWaveStats(_currentHealthModifier, dataToSpawn.xpYield, dataToSpawn.scoreYield);
                 enemyScript.OnEnemyDied += HandleEnemyDeath;
                 
                 _enemiesCurrentlyAlive++;
@@ -154,7 +172,7 @@ namespace ImPulse.Core
             float totalWeight = 0;
             foreach (var type in enemyTypes) totalWeight += type.spawnWeight;
 
-            float randomVal = Random.Range(0f, totalWeight);
+            float randomVal = UnityEngine.Random.Range(0f, totalWeight);
             foreach (var type in enemyTypes)
             {
                 if (randomVal < type.spawnWeight) return type;
@@ -164,7 +182,7 @@ namespace ImPulse.Core
             return enemyTypes[0]; // Fallback
         }
 
-        private void HandleEnemyDeath(Enemy deadEnemy, int xpYield)
+        private void HandleEnemyDeath(Enemy deadEnemy, int xpYield, int scoreYield)
         {
             deadEnemy.OnEnemyDied -= HandleEnemyDeath; // Unsubscribe to prevent memory leaks
             _enemiesCurrentlyAlive--;
@@ -172,6 +190,7 @@ namespace ImPulse.Core
             if (_gameManager != null)
             {
                 _gameManager.AddXP(xpYield);
+                _gameManager.AddScore(scoreYield);
             }
         }
 

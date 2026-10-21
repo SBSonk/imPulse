@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: New Basic Sword
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.BasicSword
   weaponName: New Weapon
-  damage: 10
+  damage: 20
+  finisherDamage: 30
   stunLength: 0.25
   knockbackStrength: 5
-  attackDelay: 0.1
-  finisherDelay: 0.2
+  mistimedDamageMultiplier: 0.25
+  attackDelay: 0.2
+  finisherDelay: 0.5
   hitRadius: 1
   forwardOffset: 1
   comboAnimations:
