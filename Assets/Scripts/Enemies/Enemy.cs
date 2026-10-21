@@ -79,6 +79,7 @@ namespace ImPulse.Enemies
             {
                 _audioHandler.OnBeat += OnBeat;
                 _audioHandler.OnHalfBeat += OnHalfBeat;
+                _audioHandler.OnQuarterBeat += OnQuarterBeat;
             }
             
             _isDead = false;
@@ -98,6 +99,7 @@ namespace ImPulse.Enemies
             {
                 _audioHandler.OnBeat -= OnBeat;
                 _audioHandler.OnHalfBeat -= OnHalfBeat;
+                _audioHandler.OnQuarterBeat -= OnQuarterBeat;
             }
         }
 
@@ -132,6 +134,7 @@ namespace ImPulse.Enemies
         
         protected virtual void OnBeat(int beatIndex) { }
         protected virtual void OnHalfBeat(int halfBeatIndex) { }
+        protected virtual void OnQuarterBeat(int quarterBeatIndex) { }
 
         protected virtual void CollisionEnter(CustomCollider other) { }
         protected virtual void CollisionStay(CustomCollider other) { }

@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &58307816146531938
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1038162570255374796, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_Name
+      value: SymphonyMiniboss Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4004312682538132691, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5673308480747189181, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_Color.b
+      value: 0.41960788
+      objectReference: {fileID: 0}
+    - target: {fileID: 5673308480747189181, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      propertyPath: m_Color.g
+      value: 0.68862367
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1776579971943887870, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1038162570255374796, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8533227643389552945}
+  m_SourcePrefab: {fileID: 100100000, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+--- !u!1 &1055933571810160558 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1038162570255374796, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+  m_PrefabInstance: {fileID: 58307816146531938}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8533227643389552945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055933571810160558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544144ee2493d864dae7fcd41c0652b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.SymphonyMiniboss
+  maxHealth: 50
+  hitInvincibilityDuration: 0
+  damage: 10
+  knockbackStrength: 5
+  stunLength: 0.5
+  moveSpeed: 3
+  knockbackEase: 5
+  minDistance: 6
+  maxDistance: 10
+  equippedWeapon: {fileID: 11400000, guid: 88d61fe3851e7c7439d10999e07d0682, type: 2}
+  bulletOrigin: {fileID: 6004936324757917947}
+  shootResolution: 2
+  shootPattern: 01000100010101010100010001010101y
+  spriteRenderer: {fileID: 0}
+  deathParticlePrefab: {fileID: 0}
+  cooldownMeasures: 1
+--- !u!4 &6004936324757917947 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6024399459440649881, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+  m_PrefabInstance: {fileID: 58307816146531938}
+  m_PrefabAsset: {fileID: 0}

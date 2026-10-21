@@ -3,6 +3,7 @@ using UnityEngine;
 using ImPulse.Player;
 using ImPulse.Core;
 using ImPulse.Core.Pooling;
+using ImPulse.Enemies;
 
 namespace ImPulse.Weapons
 {
@@ -11,35 +12,44 @@ namespace ImPulse.Weapons
     {
         public override void OnAttack(Transform playerTransform, AttackState state, int comboIndex, bool isOnBeat)
         {
-            PlayerStatus player = playerTransform.GetComponent<PlayerStatus>();
-            if (player != null)
+            // Use generic MonoBehaviour to run the coroutine instead of forcing PlayerStatus
+            MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
+            if (runner != null)
             {
-                player.StartCoroutine(FireRoutine(playerTransform, isOnBeat));
+                runner.StartCoroutine(FireRoutine(playerTransform, isOnBeat));
             }
         }
 
         public override void OnFinisher(Transform playerTransform, AttackState state, bool isOnBeat)
         {
-            PlayerStatus player = playerTransform.GetComponent<PlayerStatus>();
-            if (player != null)
+            MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
+            if (runner != null)
             {
-                player.StartCoroutine(FinisherRoutine(playerTransform, isOnBeat));
+                runner.StartCoroutine(FinisherRoutine(playerTransform, isOnBeat));
             }
+        }
+
+        private Vector3 GetOriginPos(Transform root)
+        {
+            PlayerAttack pAttack = root.GetComponent<PlayerAttack>();
+            if (pAttack != null && pAttack.GetBulletOrigin() != null) return pAttack.GetBulletOrigin().position;
+
+            BasicShooterEnemy enemy = root.GetComponent<BasicShooterEnemy>();
+            if (enemy != null) return enemy.GetBulletOrigin().position;
+
+            return root.position;
         }
 
         private IEnumerator FireRoutine(Transform playerTransform, bool isOnBeat)
         {
-            if (fireDelay > 0f)
-            {
-                yield return new WaitForSeconds(fireDelay);
-            }
-
+            if (fireDelay > 0f) yield return new WaitForSeconds(fireDelay);
             if (playerTransform == null || projectilePrefab == null || ObjectPooler.Instance == null) yield break;
 
             Vector3 fireDirection = playerTransform.right; 
             float angle = Mathf.Atan2(fireDirection.y, fireDirection.x) * Mathf.Rad2Deg;
+            Vector3 originPos = GetOriginPos(playerTransform);
             
-            GameObject projObj = ObjectPooler.Instance.Get(projectilePrefab, playerTransform.GetComponent<PlayerAttack>().GetBulletOrigin().position, Quaternion.Euler(0, 0, angle));
+            GameObject projObj = ObjectPooler.Instance.Get(projectilePrefab, originPos, Quaternion.Euler(0, 0, angle));
             Projectile projectile = projObj.GetComponent<Projectile>();
             
             if (projectile != null)
@@ -52,18 +62,14 @@ namespace ImPulse.Weapons
 
         private IEnumerator FinisherRoutine(Transform playerTransform, bool isOnBeat)
         {
-            if (finisherDelay > 0f)
-            {
-                yield return new WaitForSeconds(finisherDelay);
-            }
-
+            if (finisherDelay > 0f) yield return new WaitForSeconds(finisherDelay);
             if (playerTransform == null || ObjectPooler.Instance == null) yield break;
 
             GameObject prefabToSpawn = finisherProjectilePrefab != null ? finisherProjectilePrefab : projectilePrefab;
 
             if (prefabToSpawn != null)
             {
-                Vector3 originPos = playerTransform.GetComponent<PlayerAttack>().GetBulletOrigin().position;
+                Vector3 originPos = GetOriginPos(playerTransform);
                 Vector3 centerDir = playerTransform.right;
 
                 float d = isOnBeat ? finisherDamage : damage * mistimedDamageMultiplier;
