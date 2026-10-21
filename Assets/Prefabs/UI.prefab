@@ -1287,18 +1287,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5496889942330843815}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: 0.38268322, z: -0, w: 0.9238796}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6001215575030826424}
   m_Father: {fileID: 415512908827604387}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 397.5, y: 0}
-  m_SizeDelta: {x: -745, y: 50}
+  m_SizeDelta: {x: -745, y: 310.08}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2430053390913326885
 CanvasRenderer:
@@ -1719,6 +1719,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   staminaBar: {fileID: 6389352599039090947}
   audioVisualizer: {fileID: 7327046056284075103}
+  scoreText: {fileID: 6673328844275354375}
+  roundText: {fileID: 3079637840733846105}
 --- !u!114 &7327046056284075103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2169,6 +2171,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: 'IMPULSE IMPULSE
+
+    IMPULSE IMPULSE
+
+    IMPULSE IMPULSE
+
+    IMPULSE IMPULSE
 
     IMPULSE IMPULSE
 
@@ -3555,7 +3563,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 60000
+  m_text: 00000
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ba0f7128cbe5f7043850c5baf44f8861, type: 2}
   m_sharedMaterial: {fileID: -459834109318630849, guid: ba0f7128cbe5f7043850c5baf44f8861, type: 2}

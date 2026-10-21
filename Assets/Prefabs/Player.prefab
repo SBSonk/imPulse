@@ -92,6 +92,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &2932252577062834002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 720283469167586470}
+  m_Layer: 0
+  m_Name: Origin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &720283469167586470
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2932252577062834002}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.703, y: -0.2600003, z: 0}
+  m_LocalScale: {x: 0.5007, y: -0.15, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4575311570806074339}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4278751481733297101
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,6 +155,7 @@ Transform:
   m_Children:
   - {fileID: 5342153651913695070}
   - {fileID: 6432051137064839746}
+  - {fileID: 720283469167586470}
   m_Father: {fileID: 4133512015749063709}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &4655665656144494906
@@ -292,6 +324,7 @@ GameObject:
   - component: {fileID: 867260501224662007}
   - component: {fileID: 7329690753719449051}
   - component: {fileID: 4441434969800937290}
+  - component: {fileID: 5513326066376125285}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -335,14 +368,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   moveSpeed: 5
-  accelerationRate: 8
+  accelerationRate: 16
   frictionRate: 8
-  rotateSpeed: 25
+  rotateSpeed: 35
   dashInitialSpeed: 20
-  dashDuration: 0.35
-  dashEaseType: 5
+  dashDuration: 0.15
+  dashEaseType: 9
+  maxStamina: 3
+  staminaRegenRate: 1.5
+  dashStaminaCost: 1
   attackControlRegenDuration: 0.4
   attackEaseType: 4
+  knockbackEaseType: 9
   _currentState: 0
   _currentVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &9076429845758582708
@@ -387,10 +424,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02cc5561bef47d2438dc904f08498dfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  equippedMeleeWeapon: {fileID: 0}
-  equippedRangedWeapon: {fileID: 0}
-  comboWindow: 0.5
+  equippedMeleeWeapon: {fileID: 11400000, guid: 13485d2f03fc79f43b158e9f2d9e360d, type: 2}
+  equippedRangedWeapon: {fileID: 11400000, guid: 90fd1aba68360ba4daa8147ec5c8652d, type: 2}
   attackCancelTime: 0.1
+  attackDuration: 0.6
+  bulletOrigin: {fileID: 720283469167586470}
   _currentState: 0
 --- !u!95 &7329690753719449051
 Animator:
@@ -430,6 +468,24 @@ MonoBehaviour:
   colliderType: 0
   radius: 0.25
   layersToCheck: 0
+--- !u!114 &5513326066376125285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5858991779429229386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0381183e1ba0da45b141dcbf7c312f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Player.PlayerStatus
+  maxHealth: 50
+  hitInvincibilityDuration: 0.25
+  dashInvincibilityTime: 0.25
+  startReductionThreshold: 0.5
+  maxReductionThreshold: 0.1
+  maxDamageReduction: 0.5
 --- !u!1 &6030521553759270817
 GameObject:
   m_ObjectHideFlags: 0
