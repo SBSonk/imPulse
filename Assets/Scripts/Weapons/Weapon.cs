@@ -7,11 +7,13 @@ namespace ImPulse.Weapons
     {
         [Header("Core Weapon Stats")]
         public string weaponName = "New Weapon";
-        
+
         [Header("Damage Stats")]
         public float damage = 10;
+        public float finisherDamage = 15f;
         public float stunLength = .25f;
         public float knockbackStrength = 5;
+        public float mistimedDamageMultiplier = 0.25f;
         
 
         /// <summary>

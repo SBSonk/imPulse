@@ -1402,6 +1402,7 @@ MonoBehaviour:
   knockbackStrength: 5
   stunLength: 0.5
   moveSpeed: 1.5
+  knockbackEase: 5
   spriteRenderer: {fileID: 0}
   baseColor: {r: 1, g: 0.41960785, b: 0.41960785, a: 1}
   deathColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
@@ -3254,6 +3255,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 519420032}
     m_Modifications:
+    - target: {fileID: 160658420613693335, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 370422807246916868, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: staminaBar
       value: 
@@ -3344,19 +3349,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 491119940220786188, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 491119940220786188, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 491119940220786188, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 42.5
       objectReference: {fileID: 0}
     - target: {fileID: 491119940220786188, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -12.5
       objectReference: {fileID: 0}
     - target: {fileID: 1217373314977895123, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3368,19 +3373,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1720980487246860788, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1720980487246860788, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1720980487246860788, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 12.5
       objectReference: {fileID: 0}
     - target: {fileID: 1720980487246860788, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -12.5
       objectReference: {fileID: 0}
     - target: {fileID: 1767505177008612305, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_Color.a
@@ -3444,7 +3449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5219838654542620448, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 5963086685040609962, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_Name
@@ -3476,19 +3481,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6536591138732842647, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6536591138732842647, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6536591138732842647, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 72.5
       objectReference: {fileID: 0}
     - target: {fileID: 6536591138732842647, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -12.5
       objectReference: {fileID: 0}
     - target: {fileID: 7327046056284075103, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: musicSource
@@ -3540,6 +3545,7 @@ PrefabInstance:
     - {fileID: 4631427338501198967, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5086920610161268542, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+    - {fileID: 160658420613693335, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 415512908827604387, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       insertIndex: -1

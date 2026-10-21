@@ -16,7 +16,8 @@ namespace ImPulse.Weapons
             MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
             if (runner != null)
             {
-                runner.StartCoroutine(AttackRoutine(playerTransform, comboIndex, isOnBeat));
+                float d = isOnBeat ? damage : damage*mistimedDamageMultiplier;
+                runner.StartCoroutine(AttackRoutine(playerTransform, comboIndex, isOnBeat, d));
             }
         }
 
@@ -25,30 +26,27 @@ namespace ImPulse.Weapons
             MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
             if (runner != null)
             {
-                runner.StartCoroutine(FinisherRoutine(playerTransform, isOnBeat));
+                float d = isOnBeat ? finisherDamage : damage*mistimedDamageMultiplier;
+                runner.StartCoroutine(FinisherRoutine(playerTransform, isOnBeat, d));
             }
         }
 
-        private IEnumerator AttackRoutine(Transform playerTransform, int comboIndex, bool isOnBeat)
+        private IEnumerator AttackRoutine(Transform playerTransform, int comboIndex, bool isOnBeat, float calculatedDamage)
         {
             if (attackDelay > 0f) yield return new WaitForSeconds(attackDelay);
             if (playerTransform == null) yield break;
 
-            float calculatedDamage = damage;
-            
             Vector3 forwardDir = playerTransform.right; 
             Vector3 hitboxCenter = playerTransform.position + (forwardDir * forwardOffset);
 
             ProcessMeleeHitbox(playerTransform, hitboxCenter, hitRadius, calculatedDamage);
         }
 
-        private IEnumerator FinisherRoutine(Transform playerTransform, bool isOnBeat)
+        private IEnumerator FinisherRoutine(Transform playerTransform, bool isOnBeat, float finisherDamage)
         {
             if (finisherDelay > 0f) yield return new WaitForSeconds(finisherDelay);
             if (playerTransform == null) yield break;
 
-            float finisherDamage = damage * 2f;
-            
             Vector3 forwardDir = playerTransform.right; 
             Vector3 hitboxCenter = playerTransform.position + (forwardDir * forwardOffset);
 
@@ -107,7 +105,7 @@ namespace ImPulse.Weapons
                         var enemy = entity as Enemy;
                         enemy.ApplyKnockback(knockbackDir, knockbackStrength, stunLength);
                     }
-                    
+
                     // TODO: Instantiate hit VFX via ObjectPooler.Instance here
                 }
             }

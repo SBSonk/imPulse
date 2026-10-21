@@ -14,7 +14,7 @@ namespace ImPulse.Weapons
             PlayerStatus player = playerTransform.GetComponent<PlayerStatus>();
             if (player != null)
             {
-                player.StartCoroutine(FireRoutine(playerTransform));
+                player.StartCoroutine(FireRoutine(playerTransform, isOnBeat));
             }
         }
 
@@ -23,11 +23,11 @@ namespace ImPulse.Weapons
             PlayerStatus player = playerTransform.GetComponent<PlayerStatus>();
             if (player != null)
             {
-                player.StartCoroutine(FinisherRoutine(playerTransform));
+                player.StartCoroutine(FinisherRoutine(playerTransform, isOnBeat));
             }
         }
 
-        private IEnumerator FireRoutine(Transform playerTransform)
+        private IEnumerator FireRoutine(Transform playerTransform, bool isOnBeat)
         {
             if (fireDelay > 0f)
             {
@@ -44,12 +44,13 @@ namespace ImPulse.Weapons
             
             if (projectile != null)
             {
-                projectile.InitializeProjectile(projectileSpeed, damage, stunLength, knockbackStrength, lifeTime);
+                float d = isOnBeat ? damage : damage * mistimedDamageMultiplier;
+                projectile.InitializeProjectile(projectileSpeed, d, stunLength, knockbackStrength, lifeTime);
                 projectile.Fire(fireDirection);
             }
         }
 
-        private IEnumerator FinisherRoutine(Transform playerTransform)
+        private IEnumerator FinisherRoutine(Transform playerTransform, bool isOnBeat)
         {
             if (finisherDelay > 0f)
             {
@@ -65,13 +66,15 @@ namespace ImPulse.Weapons
                 Vector3 originPos = playerTransform.GetComponent<PlayerAttack>().GetBulletOrigin().position;
                 Vector3 centerDir = playerTransform.right;
 
-                SpawnProjectile(prefabToSpawn, originPos, centerDir, finisherSpeed, finisherDamage);
+                float d = isOnBeat ? finisherDamage : damage * mistimedDamageMultiplier;
+
+                SpawnProjectile(prefabToSpawn, originPos, centerDir, finisherSpeed, d);
 
                 Vector3 leftDir = Quaternion.Euler(0, 0, finisherSpreadAngle) * centerDir;
-                SpawnProjectile(prefabToSpawn, originPos, leftDir, finisherSpeed, finisherDamage);
+                SpawnProjectile(prefabToSpawn, originPos, leftDir, finisherSpeed, d);
 
                 Vector3 rightDir = Quaternion.Euler(0, 0, -finisherSpreadAngle) * centerDir;
-                SpawnProjectile(prefabToSpawn, originPos, rightDir, finisherSpeed, finisherDamage);
+                SpawnProjectile(prefabToSpawn, originPos, rightDir, finisherSpeed, d);
             }
         }
 

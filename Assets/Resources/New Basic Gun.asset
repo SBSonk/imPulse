@@ -13,14 +13,18 @@ MonoBehaviour:
   m_Name: New Basic Gun
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.BasicGun
   weaponName: New Weapon
-  baseDamage: 10
+  damage: 5
+  finisherDamage: 10
+  stunLength: 0.25
+  knockbackStrength: 5
+  mistimedDamageMultiplier: 0.25
+  fireDelay: 0.1
+  finisherDelay: 0.2
   projectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
-  projectileDamage: 10
   projectileSpeed: 20
   maxRange: 15
   lifeTime: 5
   finisherProjectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
-  finisherDamage: 15
   finisherSpeed: 22
   finisherSpreadAngle: 20
   fireAnimation: BowShoot1
