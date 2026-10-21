@@ -19,10 +19,7 @@ namespace ImPulse.UI
         {
             GameManager.Instance.OnScoreChanged += HandleScoreChange;
             EnemyWaveSpawner.Instance.OnRoundChange += HandleRoundChange;
-        }
 
-        private void OnEnable()
-        {
             playerStatus = FindAnyObjectByType<PlayerStatus>();
             playerMovement = FindAnyObjectByType<PlayerMovement>();
 
@@ -50,8 +47,8 @@ namespace ImPulse.UI
 
         private void OnDisable()
         {
-            GameManager.Instance.OnScoreChanged -= HandleScoreChange;
-            EnemyWaveSpawner.Instance.OnRoundChange -= HandleRoundChange;
+            if (GameManager.Instance != null) GameManager.Instance.OnScoreChanged -= HandleScoreChange;
+            if (EnemyWaveSpawner.Instance != null) EnemyWaveSpawner.Instance.OnRoundChange -= HandleRoundChange;
 
             if (playerStatus != null)
             {

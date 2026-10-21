@@ -36,24 +36,27 @@ namespace ImPulse.Weapons
             if (attackDelay > 0f) yield return new WaitForSeconds(attackDelay);
             if (playerTransform == null) yield break;
 
-            Vector3 forwardDir = playerTransform.right; 
+            Vector3 forwardDir = playerTransform.right;
             Vector3 hitboxCenter = playerTransform.position + (forwardDir * forwardOffset);
 
-            ProcessMeleeHitbox(playerTransform, hitboxCenter, hitRadius, calculatedDamage);
+            // Passes standard stun and knockback
+            ProcessMeleeHitbox(playerTransform, hitboxCenter, hitRadius, calculatedDamage, knockbackStrength, stunLength);
         }
 
-        private IEnumerator FinisherRoutine(Transform playerTransform, bool isOnBeat, float finisherDamage)
+        private IEnumerator FinisherRoutine(Transform playerTransform, bool isOnBeat, float finisherDmg)
         {
             if (finisherDelay > 0f) yield return new WaitForSeconds(finisherDelay);
             if (playerTransform == null) yield break;
 
-            Vector3 forwardDir = playerTransform.right; 
+            Vector3 forwardDir = playerTransform.right;
             Vector3 hitboxCenter = playerTransform.position + (forwardDir * forwardOffset);
 
-            ProcessMeleeHitbox(playerTransform, hitboxCenter, hitRadius * 1.5f, finisherDamage);
+            // Passes finisher stun and knockback
+            ProcessMeleeHitbox(playerTransform, hitboxCenter, hitRadius * 1.5f, finisherDmg, finisherKnockbackStrength, finisherStunLength);
         }
 
-        private void ProcessMeleeHitbox(Transform attackerTransform, Vector3 center, float radius, float damage)
+        // Updated signature to take specific stun and knockback values
+        private void ProcessMeleeHitbox(Transform attackerTransform, Vector3 center, float radius, float dmg, float knockback, float stun)
         {
             List<CustomCollider> targets = CustomCollider.GetColliders(enemyLayer);
 
@@ -67,7 +70,6 @@ namespace ImPulse.Weapons
                 float targetRadius = targetCollider.radius;
                 bool isHit = false;
 
-                // Route the check based on the target's collider type
                 if (targetCollider.colliderType == ColliderType.Circle)
                 {
                     isHit = CollisionHelper.CircleToCircle(
@@ -79,7 +81,6 @@ namespace ImPulse.Weapons
                 }
                 else if (targetCollider.colliderType == ColliderType.Square)
                 {
-                    // Remember: BoxToCircle parameters are (boxPos, boxRadius, circlePos, circleRadius)
                     isHit = CollisionHelper.BoxToCircle(
                         targetCollider.transform.position, 
                         targetRadius,
@@ -90,20 +91,22 @@ namespace ImPulse.Weapons
 
                 if (isHit)
                 {
-                    entity.TakeDamage(damage);
+                    entity.TakeDamage(dmg);
 
                     Vector3 knockbackDir = entity.transform.position - attackerTransform.position;
                     knockbackDir.Normalize();
 
                     if (entity is PlayerStatus)
                     {
-                        if (entity.TryGetComponent<PlayerMovement>(out var movement)) movement.ApplyKnockback(knockbackDir, knockbackStrength, stunLength);
+                        // Uses the locally passed knockback/stun parameters
+                        if (entity.TryGetComponent<PlayerMovement>(out var movement)) movement.ApplyKnockback(knockbackDir, knockback, stun);
                     }
 
                     if (entity is Enemy)
                     {
                         var enemy = entity as Enemy;
-                        enemy.ApplyKnockback(knockbackDir, knockbackStrength, stunLength);
+                        // Uses the locally passed knockback/stun parameters
+                        enemy.ApplyKnockback(knockbackDir, knockback, stun);
                     }
 
                     // TODO: Instantiate hit VFX via ObjectPooler.Instance here

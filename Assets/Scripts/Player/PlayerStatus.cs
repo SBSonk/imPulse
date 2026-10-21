@@ -48,7 +48,6 @@ namespace ImPulse.Player
         {
             float healthRatio = currentHealth / maxHealth;
             
-            // damage reduction for lower health to make the abstract health bar actually feel fair lol
             float reductionT = Mathf.InverseLerp(startReductionThreshold, maxReductionThreshold, healthRatio);
             float damageReduction = Mathf.Lerp(0f, maxDamageReduction, reductionT);
             float finalDamage = amount * (1f - damageReduction);
@@ -67,12 +66,25 @@ namespace ImPulse.Player
         {
             if (_isDead) return;
             
-            base.Die(); 
+            base.Die();
 
             UnityEngine.Debug.Log("Player Died! Game Over.");
 
             if (_playerMovement != null) _playerMovement.enabled = false;
             if (_playerAttack != null) _playerAttack.enabled = false;
+        }
+
+        // --- UPGRADE API --- //
+        public void SetMaxHealth(float newMaxHealth)
+        {
+            float difference = newMaxHealth - maxHealth;
+            maxHealth = newMaxHealth;
+
+            // Automatically heal the player for the exact amount of capacity they just gained
+            if (difference > 0)
+            {
+                currentHealth = Mathf.Clamp(currentHealth + difference, 0, maxHealth);
+            }
         }
     }
 }

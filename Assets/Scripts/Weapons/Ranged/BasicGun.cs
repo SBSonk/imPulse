@@ -12,7 +12,6 @@ namespace ImPulse.Weapons
     {
         public override void OnAttack(Transform playerTransform, AttackState state, int comboIndex, bool isOnBeat)
         {
-            // Use generic MonoBehaviour to run the coroutine instead of forcing PlayerStatus
             MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
             if (runner != null)
             {
@@ -45,7 +44,7 @@ namespace ImPulse.Weapons
             if (fireDelay > 0f) yield return new WaitForSeconds(fireDelay);
             if (playerTransform == null || projectilePrefab == null || ObjectPooler.Instance == null) yield break;
 
-            Vector3 fireDirection = playerTransform.right; 
+            Vector3 fireDirection = playerTransform.right;
             float angle = Mathf.Atan2(fireDirection.y, fireDirection.x) * Mathf.Rad2Deg;
             Vector3 originPos = GetOriginPos(playerTransform);
             
@@ -55,6 +54,7 @@ namespace ImPulse.Weapons
             if (projectile != null)
             {
                 float d = isOnBeat ? damage : damage * mistimedDamageMultiplier;
+                // Passes the standard stun and knockback values
                 projectile.InitializeProjectile(projectileSpeed, d, stunLength, knockbackStrength, lifeTime);
                 projectile.Fire(fireDirection);
             }
@@ -74,17 +74,19 @@ namespace ImPulse.Weapons
 
                 float d = isOnBeat ? finisherDamage : damage * mistimedDamageMultiplier;
 
-                SpawnProjectile(prefabToSpawn, originPos, centerDir, finisherSpeed, d);
+                // Passes the new finisher stun and knockback values
+                SpawnProjectile(prefabToSpawn, originPos, centerDir, finisherSpeed, d, finisherStunLength, finisherKnockbackStrength);
 
                 Vector3 leftDir = Quaternion.Euler(0, 0, finisherSpreadAngle) * centerDir;
-                SpawnProjectile(prefabToSpawn, originPos, leftDir, finisherSpeed, d);
+                SpawnProjectile(prefabToSpawn, originPos, leftDir, finisherSpeed, d, finisherStunLength, finisherKnockbackStrength);
 
                 Vector3 rightDir = Quaternion.Euler(0, 0, -finisherSpreadAngle) * centerDir;
-                SpawnProjectile(prefabToSpawn, originPos, rightDir, finisherSpeed, d);
+                SpawnProjectile(prefabToSpawn, originPos, rightDir, finisherSpeed, d, finisherStunLength, finisherKnockbackStrength);
             }
         }
 
-        private void SpawnProjectile(GameObject prefab, Vector3 startPos, Vector3 direction, float speed, float damage)
+        // Updated signature to take specific stun and knockback values
+        private void SpawnProjectile(GameObject prefab, Vector3 startPos, Vector3 direction, float speed, float dmg, float stun, float knockback)
         {
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             GameObject projObj = ObjectPooler.Instance.Get(prefab, startPos, Quaternion.Euler(0, 0, angle));
@@ -92,7 +94,7 @@ namespace ImPulse.Weapons
             
             if (projectile != null)
             {
-                projectile.InitializeProjectile(speed, damage, stunLength, knockbackStrength, lifeTime);
+                projectile.InitializeProjectile(speed, dmg, stun, knockback, lifeTime);
                 projectile.Fire(direction);
             }
         }

@@ -1,67 +1,120 @@
 using UnityEngine;
-using ImPulse.Core;
-using ImPulse.UI;
+using System.Collections.Generic;
+using ImPulse.Upgrades;
+using ImPulse.Player;
+using System;
 
 namespace ImPulse.Core
 {
+    public struct UpgradeState
+    {
+        public int currentLevel;
+        public bool isRetired;
+    }
+
     public class UpgradeManager : MonoBehaviour
     {
-        [Header("References")]
-        [SerializeField] private GameManager gameManager;
-        [SerializeField] private MenuPanelLerper menuLerper, uiLerper;
-        [SerializeField] private UIFader backgroundFader;
-        [SerializeField] private UpgradeButton[] upgradeButtons;
+        public static UpgradeManager Instance { get; private set; }
 
-        private void Start()
+        [Header("Upgrade Configuration")]
+        public int maxUpgradeChoices = 3;
+        
+        public List<UpgradeData> availableUpgrades = new List<UpgradeData>(); 
+
+        private Dictionary<UpgradeData, UpgradeState> _upgradeStates = new Dictionary<UpgradeData, UpgradeState>();
+        
+        public Action OnFinishedSelecting;
+
+        GameObject _playerInstance;
+
+        private void Awake()
         {
-            if (gameManager == null) gameManager = FindAnyObjectByType<GameManager>();
-
-            if (gameManager != null)
+            if (Instance == null)
             {
-                gameManager.OnLevelUp += HandleLevelUp;
+                Instance = this;
+                InitializeStates();
+            }
+            else
+            {
+                Destroy(gameObject);
             }
 
-            // Subscribe to all upgrade buttons
-            foreach (var btn in upgradeButtons)
+            _playerInstance = FindAnyObjectByType<PlayerStatus>().gameObject;
+        }
+
+        private void InitializeStates()
+        {
+            foreach (var upgrade in availableUpgrades)
             {
-                if (btn != null) btn.OnClick += HandleUpgradeSelected;
+                if (upgrade != null && !_upgradeStates.ContainsKey(upgrade))
+                {
+                    _upgradeStates.Add(upgrade, new UpgradeState { currentLevel = 0, isRetired = false });
+                }
             }
         }
 
-        private void OnDestroy()
+        public List<UpgradeData> GetUpgradesForLevel()
         {
-            if (gameManager != null)
+            List<UpgradeData> validUpgrades = new List<UpgradeData>();
+
+            foreach (var upgrade in availableUpgrades)
             {
-                gameManager.OnLevelUp -= HandleLevelUp;
+                if (upgrade != null && _upgradeStates.TryGetValue(upgrade, out UpgradeState state))
+                {
+                    if (!state.isRetired)
+                    {
+                        validUpgrades.Add(upgrade);
+                    }
+                }
             }
 
-            foreach (var btn in upgradeButtons)
+            List<UpgradeData> choices = new List<UpgradeData>();
+            if (validUpgrades.Count == 0) return choices;
+
+            int amount = Mathf.Min(maxUpgradeChoices, validUpgrades.Count);
+            
+            for (int i = 0; i < amount; i++)
             {
-                if (btn != null) btn.OnClick -= HandleUpgradeSelected;
+                choices.Add(validUpgrades[i]);
+            }
+
+            return choices;
+        }
+
+        public void ApplyUpgrade(UpgradeData upgrade)
+        {
+            if (upgrade == null) return;
+
+            if (_playerInstance != null)
+            {
+                if (_upgradeStates.TryGetValue(upgrade, out UpgradeState state))
+                {
+                    state.currentLevel++;
+
+                    // Mark as retired only if it isn't infinitely repeatable and has reached its cap
+                    if (!upgrade.isRepeatable || (!upgrade.isInfinitelyRepeatable && state.currentLevel >= upgrade.maxLevel))
+                    {
+                        state.isRetired = true;
+                    }
+
+                    _upgradeStates[upgrade] = state;
+                    upgrade.ApplyUpgrade(_playerInstance, state.currentLevel);
+                    OnFinishedSelecting?.Invoke();
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[UpgradeManager] Cannot apply {upgrade.upgradeName}: Player instance is not assigned.");
             }
         }
 
-        private void HandleLevelUp(int newLevel)
+        public UpgradeState GetUpgradeState(UpgradeData upgrade)
         {
-            // TODO: Populate the upgrade buttons with random stats/weapons here before showing them
-            
-            backgroundFader.FadeTo(1f);
-            menuLerper.SetState(true);
-            uiLerper.SetState(false);
-        }
-
-        private void HandleUpgradeSelected()
-        {
-            // TODO: Apply the specific upgrade chosen by the player here
-            
-            backgroundFader.FadeTo(0f);
-            menuLerper.SetState(false);
-            uiLerper.SetState(true);
-            
-            if (gameManager != null)
+            if (_upgradeStates.TryGetValue(upgrade, out UpgradeState state))
             {
-                gameManager.FinishedSelecting();
+                return state;
             }
+            return new UpgradeState { currentLevel = 0, isRetired = false };
         }
     }
 }

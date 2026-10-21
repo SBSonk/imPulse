@@ -2,11 +2,16 @@ using System;
 using ImPulse.Helpers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro; // Added for UI text manipulation
 
 namespace ImPulse.UI
 {
     public class UpgradeButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
+        [Header("UI Elements")]
+        [SerializeField] private TextMeshProUGUI titleText;
+        [SerializeField] private TextMeshProUGUI descriptionText;
+
         [Header("Visuals")]
         [SerializeField] EaseType ease = EaseType.InOutQuint;
         [SerializeField] float hoverScaleMultiplier = 1.1f;
@@ -24,6 +29,15 @@ namespace ImPulse.UI
         {
             _rectTransform = GetComponent<RectTransform>();
             _startLocalScale = _rectTransform.localScale;
+        }
+
+        /// <summary>
+        /// Populates the button's UI text components with the provided upgrade data.
+        /// </summary>
+        public void SetData(string title, string description)
+        {
+            if (titleText != null) titleText.text = title;
+            if (descriptionText != null) descriptionText.text = description;
         }
 
         public void OnPointerEnter(PointerEventData eventData)

@@ -7,7 +7,6 @@ namespace ImPulse.UI
     {
         [Header("Bar References")]
         [SerializeField] private RectTransform mainBar;
-        [SerializeField] private RectTransform ghostBar;
 
         [Header("Bar Settings")]
         [SerializeField] private float barWidth = 100f;
@@ -28,8 +27,9 @@ namespace ImPulse.UI
         {
             if (mainBar != null)
             {
-                _startPosX = mainBar.anchoredPosition.x;
-                
+                //_startPosX = mainBar.anchoredPosition.x;
+                _startPosX = 0; // idk why it wasnt reading it correctly
+
                 if (barWidth <= 0)
                 {
                     barWidth = mainBar.rect.width;

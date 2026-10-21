@@ -2,6 +2,7 @@ using ImPulse.Core;
 using ImPulse.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 namespace ImPulse.Player
 {
@@ -20,9 +21,7 @@ namespace ImPulse.Player
         public Weapon equippedRangedWeapon;
 
         [Header("Timing Windows")]
-        [Tooltip("How long before the player can input the next attack to continue the combo.")]
         public float attackCancelTime = 0.3f;
-        [Tooltip("How long the attack state actually lasts before movement is naturally restored.")]
         public float attackDuration = 0.6f;
 
         [SerializeField] Transform bulletOrigin;
@@ -34,9 +33,14 @@ namespace ImPulse.Player
         PlayerMovement _playerMovement;
         RhythmInputHandler _rhythmInputHandler;
         HasHealth _playerHealth;
+        GameManager _gameManager;
 
         float _timeSinceLastAttack = 0f;
         float _lastHealthAmount;
+        
+        // State locks to prevent combo dropping
+        bool _isUpgrading = false;
+        bool _isDashing = false;
 
         void Awake()
         {
@@ -46,6 +50,10 @@ namespace ImPulse.Player
             if (_playerMovement != null)
             {
                 _playerMovement.OnDashStart += CancelAttack;
+                _playerMovement.OnDashStart += HandleDashStart;
+                
+                // NOTE: You will need to add an OnDashEnd Action to PlayerMovement
+                _playerMovement.OnDashEnd += HandleDashEnd; 
             }
 
             _rhythmInputHandler = FindAnyObjectByType<RhythmInputHandler>();
@@ -59,12 +67,31 @@ namespace ImPulse.Player
                 _lastHealthAmount = _playerHealth.currentHealth;
                 _playerHealth.OnHealthChanged += HandleHealthChanged;
             }
+
+            _gameManager = FindAnyObjectByType<GameManager>();
+            if (_gameManager != null)
+            {
+                _gameManager.OnLevelUp += HandleUpgradeStart;
+                
+                // NOTE: Ensure GameManager invokes an event when the menu closes
+                UpgradeManager.Instance.OnFinishedSelecting += HandleUpgradeFinish; 
+            }
         }
 
         void OnDestroy()
         {
-            if (_playerMovement != null) _playerMovement.OnDashStart -= CancelAttack;
+            if (_playerMovement != null) 
+            {
+                _playerMovement.OnDashStart -= CancelAttack;
+                _playerMovement.OnDashStart -= HandleDashStart;
+                _playerMovement.OnDashEnd -= HandleDashEnd;
+            }
             if (_playerHealth != null) _playerHealth.OnHealthChanged -= HandleHealthChanged;
+            if (_gameManager != null)
+            {
+                _gameManager.OnLevelUp -= HandleUpgradeStart;
+                UpgradeManager.Instance.OnFinishedSelecting -= HandleUpgradeFinish;
+            }
         }
 
         private void Update()
@@ -82,11 +109,16 @@ namespace ImPulse.Player
             _lastHealthAmount = currentHealth;
         }
 
+        private void HandleUpgradeStart(int level) => _isUpgrading = true;
+        private void HandleUpgradeFinish() => _isUpgrading = false;
+        
+        private void HandleDashStart() => _isDashing = true;
+        private void HandleDashEnd() => _isDashing = false;
+
         private void UpdateStateTransitions()
         {
             if (_currentState == AttackState.Idle || _currentState == AttackState.Special) return;
 
-            // Only return to idle (and free movement) when the full attack animation duration has passed
             if (_timeSinceLastAttack > attackDuration)
             {
                 ReturnToIdle(); 
@@ -115,9 +147,11 @@ namespace ImPulse.Player
 
         bool CanAttack() 
         {
+            // Block attacks entirely if dashing or in the upgrade menu
+            if (_isUpgrading || _isDashing) return false;
+
             if (_currentState == AttackState.Idle) return true;
             
-            // Allow the player to override the current attack early to continue the combo
             return _timeSinceLastAttack >= attackCancelTime;
         }
 
@@ -182,7 +216,6 @@ namespace ImPulse.Player
             _currentState = AttackState.Idle;
             _animator.Play("Idle");
             
-            // Explicitly free movement if cancelled by a dash
             if (_playerMovement != null) _playerMovement.FreeAttackState();
         }
 

@@ -40,7 +40,10 @@ namespace ImPulse.Enemies
 
             _collider = GetComponent<CustomCollider>();
             _audioHandler = FindAnyObjectByType<AudioHandler>();
+        }
 
+        void Start()
+        {
             if (CustomCollider.LayerGroups[(int)CollisionLayer.Player].Count > 0)
             {
                 _playerTransform = CustomCollider.LayerGroups[(int)CollisionLayer.Player][0].transform;

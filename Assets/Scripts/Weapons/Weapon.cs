@@ -1,5 +1,5 @@
 using UnityEngine;
-using ImPulse.Player; // To access the AttackState enum
+using ImPulse.Player;
 
 namespace ImPulse.Weapons
 {
@@ -8,27 +8,26 @@ namespace ImPulse.Weapons
         [Header("Core Weapon Stats")]
         public string weaponName = "New Weapon";
 
-        [Header("Damage Stats")]
+        [Header("Timing Stats (Fire Rate)")]
+        [Tooltip("How long before the player can input the next attack to continue the combo.")]
+        public float attackCancelTime = 0.3f;
+        [Tooltip("How long the attack state actually lasts before movement is naturally restored.")]
+        public float attackDuration = 0.6f;
+
+        [Header("Standard Attack Stats")]
         public float damage = 10;
-        public float finisherDamage = 15f;
         public float stunLength = .25f;
-        public float knockbackStrength = 5;
+        public float knockbackStrength = 5f;
+
+        [Header("Finisher Stats")]
+        public float finisherDamage = 15f;
+        public float finisherStunLength = 0.5f;
+        public float finisherKnockbackStrength = 8f;
+
+        [Header("Modifiers")]
         public float mistimedDamageMultiplier = 0.25f;
-        
 
-        /// <summary>
-        /// Called on every standard hit of the combo.
-        /// </summary>
-        /// <param name="playerTransform">The player's transform for spawning hitboxes/projectiles.</param>
-        /// <param name="state">The current AttackState (Melee, Ranged, etc).</param>
-        /// <param name="comboIndex">Which hit in the combo this is (e.g. 0, 1, 2).</param>
         public abstract void OnAttack(Transform playerTransform, AttackState state, int comboIndex, bool isOnBeat);
-
-        /// <summary>
-        /// Called ONLY on the final hit of a combo sequence.
-        /// </summary>
-        /// <param name="playerTransform">The player's transform.</param>
-        /// <param name="state">The current AttackState.</param>
         public abstract void OnFinisher(Transform playerTransform, AttackState state, bool isOnBeat);
     }
 }
