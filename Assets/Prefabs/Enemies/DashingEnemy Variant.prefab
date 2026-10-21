@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &1235760027304523701
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 887969632605812113, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_Color.b
+      value: 0.4156863
+      objectReference: {fileID: 0}
+    - target: {fileID: 887969632605812113, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_Color.g
+      value: 0.6862745
+      objectReference: {fileID: 0}
+    - target: {fileID: 5512789636176781280, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_Name
+      value: DashingEnemy Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.018089
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -10.429696
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12.55908
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465424277790712575, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5512789636176781280, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1005421516619163857}
+  m_SourcePrefab: {fileID: 100100000, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+--- !u!1 &6748382108182997077 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5512789636176781280, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+  m_PrefabInstance: {fileID: 1235760027304523701}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1005421516619163857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6748382108182997077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a318668f3af3914882f957f33e3d6f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.DashingEnemy
+  maxHealth: 30
+  hitInvincibilityDuration: 0
+  damage: 10
+  knockbackStrength: 5
+  stunLength: 0.5
+  moveSpeed: 3
+  knockbackEase: 5
+  dashSpeed: 15
+  dashDuration: 0.3
+  dashEase: 5
+  dashResolution: 1
+  dashPattern: 0100010101000101y
+  spriteRenderer: {fileID: 0}
+  deathParticlePrefab: {fileID: 0}

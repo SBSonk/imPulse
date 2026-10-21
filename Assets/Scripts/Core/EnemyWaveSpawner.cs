@@ -15,6 +15,8 @@ namespace ImPulse.Core
         [Range(0, 100)] public float spawnWeight;
         public int xpYield;
         public int scoreYield;
+        [Tooltip("The maximum amount of this specific enemy type allowed alive at once. 0 means unlimited.")]
+        public int maxAliveAtOnce;
     }
 
     public class EnemyWaveSpawner : MonoBehaviour
@@ -61,6 +63,10 @@ namespace ImPulse.Core
         private float _spawnTimer = 0f;
         private bool _isWaitingForNextRound = false;
 
+        // Tracking active instances per type
+        private int[] _aliveCountPerType;
+        private Dictionary<Enemy, int> _activeEnemyTypeMap = new Dictionary<Enemy, int>();
+
         void Awake()
         {
             if (!Instance) Instance = this;
@@ -77,6 +83,8 @@ namespace ImPulse.Core
             _gameManager = FindAnyObjectByType<GameManager>();
             _playerTransform = FindAnyObjectByType<PlayerMovement>().transform;
             
+            _aliveCountPerType = new int[enemyTypes.Count];
+            
             StartWave(1);
         }
 
@@ -84,14 +92,12 @@ namespace ImPulse.Core
         {
             if (!_isRoundActive || _isWaitingForNextRound || _playerTransform == null) return;
 
-            // Check if the round is completely finished
             if (_enemiesSpawnedThisRound >= _currentTotalEnemies && _enemiesCurrentlyAlive <= 0)
             {
                 StartCoroutine(NextRoundRoutine());
                 return;
             }
 
-            // Handle Spawning
             if (_enemiesSpawnedThisRound < _currentTotalEnemies && _enemiesCurrentlyAlive < _currentMaxAlive)
             {
                 _spawnTimer -= Time.deltaTime;
@@ -106,9 +112,7 @@ namespace ImPulse.Core
         private void StartWave(int round)
         {
             currentRound = round;
-
             OnRoundChange?.Invoke(round);
-
             _enemiesSpawnedThisRound = 0;
             
             ApplyRoundScaling();
@@ -133,15 +137,18 @@ namespace ImPulse.Core
 
             for (int i = 0; i < amountToSpawn; i++)
             {
-                SpawnSingleEnemy();
+                // Break out early if no eligible enemies can be spawned due to type caps
+                if (!SpawnSingleEnemy()) break; 
             }
         }
 
-        private void SpawnSingleEnemy()
+        private bool SpawnSingleEnemy()
         {
-            EnemySpawnData dataToSpawn = GetRandomEnemyType();
+            if (!GetRandomValidEnemyType(out int typeIndex, out EnemySpawnData dataToSpawn)) 
+            {
+                return false;
+            }
             
-            // Random point on a 2D circle edge
             Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
             Vector3 spawnPos = _playerTransform.position + new Vector3(randomDir.x, randomDir.y, 0f) * spawnRadius;
 
@@ -158,34 +165,78 @@ namespace ImPulse.Core
             Enemy enemyScript = enemyObj.GetComponent<Enemy>();
             if (enemyScript != null)
             {
-                // Scale health and hook up the death event
                 enemyScript.InitializeWaveStats(_currentHealthModifier, dataToSpawn.xpYield, dataToSpawn.scoreYield);
                 enemyScript.OnEnemyDied += HandleEnemyDeath;
                 
                 _enemiesCurrentlyAlive++;
                 _enemiesSpawnedThisRound++;
+                
+                // Track this specific enemy type
+                _aliveCountPerType[typeIndex]++;
+                _activeEnemyTypeMap.TryAdd(enemyScript, typeIndex);
             }
+            
+            return true;
         }
 
-        private EnemySpawnData GetRandomEnemyType()
+        private bool GetRandomValidEnemyType(out int selectedIndex, out EnemySpawnData selectedData)
         {
+            selectedIndex = -1;
+            selectedData = default;
             float totalWeight = 0;
-            foreach (var type in enemyTypes) totalWeight += type.spawnWeight;
-
-            float randomVal = UnityEngine.Random.Range(0f, totalWeight);
-            foreach (var type in enemyTypes)
+            
+            // Only weigh types that haven't hit their max local cap
+            for (int i = 0; i < enemyTypes.Count; i++)
             {
-                if (randomVal < type.spawnWeight) return type;
-                randomVal -= type.spawnWeight;
+                if (enemyTypes[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < enemyTypes[i].maxAliveAtOnce)
+                {
+                    totalWeight += enemyTypes[i].spawnWeight;
+                }
             }
 
-            return enemyTypes[0]; // Fallback
+            if (totalWeight <= 0) return false;
+
+            float randomVal = UnityEngine.Random.Range(0f, totalWeight);
+            
+            for (int i = 0; i < enemyTypes.Count; i++)
+            {
+                if (enemyTypes[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < enemyTypes[i].maxAliveAtOnce)
+                {
+                    if (randomVal < enemyTypes[i].spawnWeight)
+                    {
+                        selectedIndex = i;
+                        selectedData = enemyTypes[i];
+                        return true;
+                    }
+                    randomVal -= enemyTypes[i].spawnWeight;
+                }
+            }
+
+            // Fallback to first available uncapped type
+            for (int i = 0; i < enemyTypes.Count; i++)
+            {
+                if (enemyTypes[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < enemyTypes[i].maxAliveAtOnce)
+                {
+                    selectedIndex = i;
+                    selectedData = enemyTypes[i];
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void HandleEnemyDeath(Enemy deadEnemy, int xpYield, int scoreYield)
         {
-            deadEnemy.OnEnemyDied -= HandleEnemyDeath; // Unsubscribe to prevent memory leaks
+            deadEnemy.OnEnemyDied -= HandleEnemyDeath;
             _enemiesCurrentlyAlive--;
+
+            // Free up the local cap limit for this enemy type
+            if (_activeEnemyTypeMap.TryGetValue(deadEnemy, out int typeIndex))
+            {
+                _aliveCountPerType[typeIndex]--;
+                _activeEnemyTypeMap.Remove(deadEnemy);
+            }
 
             if (_gameManager != null)
             {

@@ -1021,8 +1021,24 @@ MonoBehaviour:
   enemyTypes:
   - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
     spawnWeight: 100
-    xpYield: 6
+    xpYield: 1
     scoreYield: 100
+    maxAliveAtOnce: 6
+  - enemyPrefab: {fileID: 1005421516619163857, guid: 5e15d1a997b866e45b2ecd9706dcff8e, type: 3}
+    spawnWeight: 30
+    xpYield: 2
+    scoreYield: 250
+    maxAliveAtOnce: 2
+  - enemyPrefab: {fileID: 1776579971943887870, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+    spawnWeight: 15
+    xpYield: 2
+    scoreYield: 250
+    maxAliveAtOnce: 1
+  - enemyPrefab: {fileID: 8533227643389552945, guid: 631ab305ee2dd494facd8d3549cf2031, type: 3}
+    spawnWeight: 5
+    xpYield: 5
+    scoreYield: 500
+    maxAliveAtOnce: 1
   timeBetweenWaves: 3
   spawnRadius: 10
   baseTotalEnemies: 10
@@ -1269,6 +1285,26 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3109434202727066622, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: onPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3109434202727066622, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: offPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116501249772931118, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4921258597477850784, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4921258597477850784, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5109181107748994131, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1311,6 +1347,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5362703687364683353, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5881987819881642291, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
+      propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5963086685040609962, guid: f2681cf4121008c468d1b3028fa48004, type: 3}
