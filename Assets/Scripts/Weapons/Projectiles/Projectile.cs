@@ -1,6 +1,7 @@
 using UnityEngine;
 using ImPulse.Core;
 using ImPulse.Core.Pooling;
+using System.Collections.Generic;
 
 namespace ImPulse.Weapons
 {
@@ -11,12 +12,17 @@ namespace ImPulse.Weapons
         protected float _maxLifetime;
         protected float _stunLength;
         protected float _knockbackStrength;
+        
+        protected int _maxPierces;
+        protected int _currentPierces;
 
         protected GameObject _sourcePrefab;
         protected Vector3 _direction;
         protected float _lifetimeTimer;
         
         protected TrailRenderer _trailRenderer;
+        
+        protected HashSet<CustomCollider> _hitTargets = new HashSet<CustomCollider>();
 
         protected virtual void Awake()
         {
@@ -41,6 +47,7 @@ namespace ImPulse.Weapons
         public virtual void OnPoolReturn()
         {
             _direction = Vector3.zero;
+            _hitTargets.Clear();
             
             if (_trailRenderer != null)
             {
@@ -49,7 +56,7 @@ namespace ImPulse.Weapons
             }
         }
 
-        public virtual void InitializeProjectile(float speed, float damage, float stunLength, float knockback, float maxLifetime)
+        public virtual void InitializeProjectile(float speed, float damage, float stunLength, float knockback, float maxLifetime, int pierce = 1)
         {
             _speed = speed;
             _damage = damage;
@@ -57,6 +64,10 @@ namespace ImPulse.Weapons
             _lifetimeTimer = _maxLifetime;
             _stunLength = stunLength;
             _knockbackStrength = knockback;
+            
+            _maxPierces = pierce;
+            _currentPierces = pierce;
+            _hitTargets.Clear();
         }
 
         public virtual void Fire(Vector3 direction)
@@ -77,7 +88,7 @@ namespace ImPulse.Weapons
 
         protected override void Update()
         {
-            base.Update(); // run the collisionc heck
+            base.Update();
 
             _lifetimeTimer -= Time.deltaTime;
             if (_lifetimeTimer <= 0f)
@@ -92,13 +103,15 @@ namespace ImPulse.Weapons
         protected virtual void HandleMovement()
         {
             Vector3 moveDelta = _direction * _speed * Time.deltaTime;
-            moveDelta.z = 0; 
+            moveDelta.z = 0;
             
             transform.position += moveDelta;
         }
 
         private void HandleCollisionEnter(CustomCollider other)
         {
+            if (_hitTargets.Contains(other)) return;
+            
             OnHit(other);
         }
 

@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: Enemy Gun
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.BasicGun
   weaponName: New Weapon
+  attackCancelTime: 0.3
+  attackDuration: 0.6
   damage: 5
-  finisherDamage: 10
   stunLength: 0.25
   knockbackStrength: 5
+  finisherDamage: 10
+  finisherStunLength: 0.5
+  finisherKnockbackStrength: 8
   mistimedDamageMultiplier: 0.25
   fireDelay: 0.1
   finisherDelay: 0.2
   projectilePrefab: {fileID: 8268035126565580521, guid: a48c6976f885bd74aa96768dabb08df3, type: 3}
-  projectileSpeed: 20
+  projectileSpeed: 10
   maxRange: 15
   lifeTime: 5
   finisherProjectilePrefab: {fileID: 8268035126565580521, guid: a48c6976f885bd74aa96768dabb08df3, type: 3}

@@ -27,7 +27,7 @@ namespace ImPulse.Enemies
             // Calculate the measure logic BEFORE calling base.OnBeat so _isActiveMeasure is ready
             if (beatIndex % 4 == 0)
             {
-                if (_isShooting) // inherited from BasicShooterEnemy
+                if (_isShooting) 
                 {
                     if (_isActiveMeasure)
                     {
@@ -36,10 +36,7 @@ namespace ImPulse.Enemies
                             _isActiveMeasure = false;
                             _cooldownCounter = 0;
                         }
-                        else
-                        {
-                            _comboIndex = 0;
-                        }
+                        else _comboIndex = 0;
                     }
                     else
                     {
@@ -59,16 +56,13 @@ namespace ImPulse.Enemies
                 }
             }
 
-            // Let the base handle the death check and calling ProcessShootPattern
             base.OnBeat(beatIndex);
         }
 
         protected override void ProcessShootPattern(int step)
         {
-            // Block the shot if we are resting this measure
             if (!_isActiveMeasure) return;
 
-            // Otherwise, let BasicShooterEnemy fire normally
             base.ProcessShootPattern(step);
         }
     }

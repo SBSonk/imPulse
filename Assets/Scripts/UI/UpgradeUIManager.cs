@@ -69,22 +69,20 @@ namespace ImPulse.UI
                 if (upgradeButton != null)
                 {
                     string displayName = upgrade.upgradeName;
+                    UpgradeState state = UpgradeManager.Instance.GetUpgradeState(upgrade);
+                    int nextLevel = state.currentLevel + 1;
 
-                    // Append Roman numeral if repeatable with a max level (e.g. Endura - I)
                     if (upgrade.isRepeatable && !upgrade.isInfinitelyRepeatable && upgrade.maxLevel > 1)
                     {
-                        UpgradeState state = UpgradeManager.Instance.GetUpgradeState(upgrade);
-                        int nextLevel = state.currentLevel + 1;
-                        displayName += $" - {ToRoman(nextLevel)}";
+                        displayName += $" - {IntToRomanString(nextLevel)}";
                     }
                     else if (upgrade.isInfinitelyRepeatable)
                     {
-                        // Optional: just append standard numbers for infinitely scaling upgrades
-                        UpgradeState state = UpgradeManager.Instance.GetUpgradeState(upgrade);
                         if (state.currentLevel > 0) displayName += $" +{state.currentLevel}";
                     }
 
-                    upgradeButton.SetData(displayName, upgrade.description);
+                    string displayDescription = upgrade.GetDescription(nextLevel);
+                    upgradeButton.SetData(displayName, displayDescription);
                     
                     UpgradeData capturedUpgrade = upgrade;
                     upgradeButton.OnClick += () => HandleUpgradeSelected(capturedUpgrade);
@@ -124,7 +122,7 @@ namespace ImPulse.UI
             _activeButtons.Clear();
         }
 
-        private string ToRoman(int number)
+        private string IntToRomanString(int number)
         {
             if (number < 1) return string.Empty;
             if (number >= 4000) return number.ToString(); 

@@ -3,6 +3,7 @@ using ImPulse.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
+using System.Collections.Generic;
 
 namespace ImPulse.Player
 {
@@ -14,11 +15,36 @@ namespace ImPulse.Player
         Special 
     }
 
+    public enum WeaponSlot
+    {
+        Melee,
+        Ranged
+    }
+
+    [Serializable]
+    public struct SleightWeaponMapping
+    {
+        public SleightType sleight;
+        public Weapon sleightWeapon;
+        public string animationName;
+        public float cooldown;
+    }
+
     public class PlayerAttack : MonoBehaviour
     {
         [Header("Equipped Weapons")]
         public Weapon equippedMeleeWeapon;
         public Weapon equippedRangedWeapon;
+
+        [Header("Sleight Arsenal (Master List)")]
+        [Tooltip("Define all possible sleights and their base animations/cooldowns here.")]
+        public List<SleightWeaponMapping> sleightWeapons = new List<SleightWeaponMapping>();
+        
+        [Header("Sleight State (Read Only)")]
+        public List<SleightType> unlockedSleights = new List<SleightType>();
+        public SleightType currentStashedSleight = SleightType.None;
+        [SerializeField] private bool _isSleightOnCooldown = false;
+        [SerializeField] private float _sleightCooldownTimer = 0f;
 
         [Header("Timing Windows")]
         public float attackCancelTime = 0.3f;
@@ -38,9 +64,10 @@ namespace ImPulse.Player
         float _timeSinceLastAttack = 0f;
         float _lastHealthAmount;
         
-        // State locks to prevent combo dropping
         bool _isUpgrading = false;
         bool _isDashing = false;
+
+        private Dictionary<SleightType, SleightWeaponMapping> _sleightMap = new Dictionary<SleightType, SleightWeaponMapping>();
 
         void Awake()
         {
@@ -51,12 +78,22 @@ namespace ImPulse.Player
             {
                 _playerMovement.OnDashStart += CancelAttack;
                 _playerMovement.OnDashStart += HandleDashStart;
-                
-                // NOTE: You will need to add an OnDashEnd Action to PlayerMovement
                 _playerMovement.OnDashEnd += HandleDashEnd; 
             }
 
             _rhythmInputHandler = FindAnyObjectByType<RhythmInputHandler>();
+            if (_rhythmInputHandler != null)
+            {
+                _rhythmInputHandler.OnSleightTriggered += ExecuteSpecialSleight;
+            }
+
+            foreach (var mapping in sleightWeapons)
+            {
+                if (!_sleightMap.ContainsKey(mapping.sleight))
+                {
+                    _sleightMap.Add(mapping.sleight, mapping);
+                }
+            }
         }
 
         void Start()
@@ -72,10 +109,13 @@ namespace ImPulse.Player
             if (_gameManager != null)
             {
                 _gameManager.OnLevelUp += HandleUpgradeStart;
-                
-                // NOTE: Ensure GameManager invokes an event when the menu closes
-                UpgradeManager.Instance.OnFinishedSelecting += HandleUpgradeFinish; 
+                if (UpgradeManager.Instance != null)
+                {
+                    UpgradeManager.Instance.OnFinishedSelecting += HandleUpgradeFinish; 
+                }
             }
+
+            RollNextSleight();
         }
 
         void OnDestroy()
@@ -86,11 +126,18 @@ namespace ImPulse.Player
                 _playerMovement.OnDashStart -= HandleDashStart;
                 _playerMovement.OnDashEnd -= HandleDashEnd;
             }
+            if (_rhythmInputHandler != null)
+            {
+                _rhythmInputHandler.OnSleightTriggered -= ExecuteSpecialSleight;
+            }
             if (_playerHealth != null) _playerHealth.OnHealthChanged -= HandleHealthChanged;
             if (_gameManager != null)
             {
                 _gameManager.OnLevelUp -= HandleUpgradeStart;
-                UpgradeManager.Instance.OnFinishedSelecting -= HandleUpgradeFinish;
+                if (UpgradeManager.Instance != null)
+                {
+                    UpgradeManager.Instance.OnFinishedSelecting -= HandleUpgradeFinish;
+                }
             }
         }
 
@@ -98,6 +145,73 @@ namespace ImPulse.Player
         {
             _timeSinceLastAttack += Time.deltaTime;
             UpdateStateTransitions();
+            UpdateSleightCooldowns();
+        }
+        
+        private void UpdateSleightCooldowns()
+        {
+            if (_isSleightOnCooldown)
+            {
+                _sleightCooldownTimer -= Time.deltaTime;
+                if (_sleightCooldownTimer <= 0f)
+                {
+                    RollNextSleight();
+                }
+            }
+        }
+        
+        private void RollNextSleight()
+        {
+            if (unlockedSleights == null || unlockedSleights.Count == 0) return;
+
+            _isSleightOnCooldown = false;
+            
+            int randomIndex = UnityEngine.Random.Range(0, unlockedSleights.Count);
+            currentStashedSleight = unlockedSleights[randomIndex];
+
+            if (_rhythmInputHandler != null)
+            {
+                _rhythmInputHandler.ActiveSleight = currentStashedSleight;
+            }
+        }
+
+        // --- UPGRADE API --- //
+        public void ChangeWeapon(WeaponSlot slot, Weapon newWeapon)
+        {
+            if (slot == WeaponSlot.Melee)
+            {
+                equippedMeleeWeapon = newWeapon;
+            }
+            else if (slot == WeaponSlot.Ranged)
+            {
+                equippedRangedWeapon = newWeapon;
+            }
+        }
+
+        public void UnlockSleight(SleightType sleight)
+        {
+            if (!unlockedSleights.Contains(sleight))
+            {
+                unlockedSleights.Add(sleight);
+                
+                if (currentStashedSleight == SleightType.None && !_isSleightOnCooldown)
+                {
+                    RollNextSleight();
+                }
+            }
+        }
+
+        public void UpdateSleightWeapon(SleightType sleight, Weapon newWeapon)
+        {
+            if (_sleightMap.TryGetValue(sleight, out SleightWeaponMapping mapping))
+            {
+                mapping.sleightWeapon = newWeapon;
+                _sleightMap[sleight] = mapping;
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[PlayerAttack] Cannot update weapon for {sleight}. It is not defined in the Sleight Arsenal inspector list.");
+            }
         }
 
         private void HandleHealthChanged(float currentHealth, float maxHealth)
@@ -117,7 +231,7 @@ namespace ImPulse.Player
 
         private void UpdateStateTransitions()
         {
-            if (_currentState == AttackState.Idle || _currentState == AttackState.Special) return;
+            if (_currentState == AttackState.Idle) return;
 
             if (_timeSinceLastAttack > attackDuration)
             {
@@ -130,7 +244,11 @@ namespace ImPulse.Player
             if (value.isPressed && CanAttack())
             {
                 bool isOnBeat = false;
-                if (_rhythmInputHandler != null) isOnBeat = _rhythmInputHandler.ProcessInput();
+                if (_rhythmInputHandler != null) 
+                {
+                    isOnBeat = _rhythmInputHandler.ProcessInput(RhythmInputType.Melee);
+                    if (_rhythmInputHandler.TriggeredSleight != SleightType.None) return;
+                }
                 ExecuteAttack(isRanged: false, isOnBeat);
             } 
         }
@@ -140,18 +258,19 @@ namespace ImPulse.Player
             if (value.isPressed && CanAttack())
             {
                 bool isOnBeat = false;
-                if (_rhythmInputHandler != null) isOnBeat = _rhythmInputHandler.ProcessInput();
+                if (_rhythmInputHandler != null) 
+                {
+                    isOnBeat = _rhythmInputHandler.ProcessInput(RhythmInputType.Ranged);
+                    if (_rhythmInputHandler.TriggeredSleight != SleightType.None) return;
+                }
                 ExecuteAttack(isRanged: true, isOnBeat);
             }
         }
 
         bool CanAttack() 
         {
-            // Block attacks entirely if dashing or in the upgrade menu
             if (_isUpgrading || _isDashing) return false;
-
             if (_currentState == AttackState.Idle) return true;
-            
             return _timeSinceLastAttack >= attackCancelTime;
         }
 
@@ -168,10 +287,7 @@ namespace ImPulse.Player
 
             if (isRanged)
             {
-                if (rangedWeapon != null)
-                {
-                    animToPlay = isFinisher ? rangedWeapon.finisherAnimation : rangedWeapon.fireAnimation;
-                }
+                if (rangedWeapon != null) animToPlay = isFinisher ? rangedWeapon.finisherAnimation : rangedWeapon.fireAnimation;
             }
             else 
             {
@@ -199,15 +315,34 @@ namespace ImPulse.Player
             if (_animator != null && !string.IsNullOrEmpty(animToPlay)) _animator.Play(animToPlay, 0, 0f);
         }
 
-        public void ExecuteSpecialSleight(string sleightAnimation)
+        public void ExecuteSpecialSleight(SleightType sleight)
         {
+            if (!_sleightMap.TryGetValue(sleight, out SleightWeaponMapping mapping)) return;
+
             _currentState = AttackState.Special;
             _timeSinceLastAttack = 0f;
 
-            if (_playerMovement != null) _playerMovement.EnterAttackState();
-            if (_animator != null) _animator.Play(sleightAnimation, 0, 0f);
+            if (_playerMovement != null && !_isDashing) _playerMovement.EnterAttackState();
+            
+            if (_animator != null && !string.IsNullOrEmpty(mapping.animationName)) 
+            {
+                _animator.Play(mapping.animationName, 0, 0f);
+            }
 
-            if (_rhythmInputHandler != null) _rhythmInputHandler.DropCombo();
+            if (mapping.sleightWeapon != null)
+            {
+                mapping.sleightWeapon.OnFinisher(transform, _currentState, isOnBeat: true);
+            }
+
+            if (_rhythmInputHandler != null) 
+            {
+                _rhythmInputHandler.DropCombo();
+                _rhythmInputHandler.ActiveSleight = SleightType.None;
+            }
+            
+            currentStashedSleight = SleightType.None;
+            _sleightCooldownTimer = mapping.cooldown;
+            _isSleightOnCooldown = true;
         }
 
         public void CancelAttack()

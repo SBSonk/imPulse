@@ -1,37 +1,40 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerFaceMouse : MonoBehaviour
+namespace ImPulse.Player
 {
-    [SerializeField] float slerpSpeed = 100;
-
-    private Camera _mainCamera;
-    Vector2 _rawMousePos;
-
-    private void Start()
+    public class PlayerFaceMouse : MonoBehaviour
     {
-        _mainCamera = Camera.main;
-    }
+        [SerializeField] float slerpSpeed = 100;
 
-    private void Update()
-    {
-        if (Mouse.current == null) return;
+        private Camera _mainCamera;
+        Vector2 _rawMousePos;
 
-        Vector3 rawMousePos = _rawMousePos;
-        rawMousePos.z = -10;
-        Vector3 mousePosition = _mainCamera.ScreenToWorldPoint(rawMousePos);
+        private void Start()
+        {
+            _mainCamera = Camera.main;
+        }
 
-        Vector2 dir = transform.position - mousePosition;
- 
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        private void Update()
+        {
+            if (Mouse.current == null) return;
 
-        Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+            Vector3 rawMousePos = _rawMousePos;
+            rawMousePos.z = -10;
+            Vector3 mousePosition = _mainCamera.ScreenToWorldPoint(rawMousePos);
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, slerpSpeed * Time.deltaTime);
-    }
+            Vector2 dir = transform.position - mousePosition;
+    
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
-    public void OnLook(InputValue value)
-    {
-        _rawMousePos = value.Get<Vector2>();
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, slerpSpeed * Time.deltaTime);
+        }
+
+        public void OnLook(InputValue value)
+        {
+            _rawMousePos = value.Get<Vector2>();
+        }
     }
 }

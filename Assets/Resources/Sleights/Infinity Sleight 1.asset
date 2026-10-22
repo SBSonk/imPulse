@@ -9,14 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c5c245017d3f2c4892fb2e5306021ac, type: 3}
-  m_Name: New Basic Gun
-  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.BasicGun
-  weaponName: New Weapon
-  damage: 5
-  finisherDamage: 10
+  m_Script: {fileID: 11500000, guid: b337c3615c085f5499a39c838277e133, type: 3}
+  m_Name: Infinity Sleight 1
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.InfinitySleightWeapon
+  weaponName: Infinity Sleight 1
+  attackCancelTime: 0.3
+  attackDuration: 0.6
+  damage: 10
   stunLength: 0.25
   knockbackStrength: 5
+  finisherDamage: 15
+  finisherStunLength: 0.5
+  finisherKnockbackStrength: 8
   mistimedDamageMultiplier: 0.25
   fireDelay: 0.1
   finisherDelay: 0.2
@@ -27,5 +31,7 @@ MonoBehaviour:
   finisherProjectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
   finisherSpeed: 22
   finisherSpreadAngle: 20
-  fireAnimation: BowShoot1
-  finisherAnimation: BowShoot2
+  fireAnimation: 
+  finisherAnimation: 
+  bulletCount: 12
+  spawnRadiusOffset: 0.75

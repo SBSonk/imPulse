@@ -15,7 +15,7 @@ namespace ImPulse.Enemies
 
         [Header("Rhythm Pattern")]
         public PatternResolution dashResolution = PatternResolution.Whole;
-        public bool[] dashPattern = { true, false, false, false }; // e.g., Dashes once every measure
+        public bool[] dashPattern = { true, false, false, false }; 
 
         [Header("Visuals")]
         public SpriteRenderer spriteRenderer;
@@ -56,7 +56,6 @@ namespace ImPulse.Enemies
                 _dashTimer += Time.deltaTime;
                 float dashNormTime = Mathf.Clamp01(_dashTimer / dashDuration);
                 
-                // Decelerate the dash over its duration using the ease curve
                 float speedMultiplier = 1f - Easing.Evaluate(dashEase, dashNormTime);
                 
                 transform.position += _dashDirection * (dashSpeed * speedMultiplier) * Time.deltaTime;
@@ -133,7 +132,6 @@ namespace ImPulse.Enemies
             }
         }
 
-        // Shared damage logic from BasicWalkingEnemy
         protected override void CollisionEnter(CustomCollider other)
         {
             if (other.layer != CollisionLayer.Player) return;

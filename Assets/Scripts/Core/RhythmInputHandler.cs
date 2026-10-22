@@ -1,8 +1,30 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ImPulse.Core
 {
+    public enum RhythmInputType
+    {
+        None = 0,
+        Dash = 1,
+        Melee = 2,
+        Ranged = 3
+    }
+
+    public enum SleightType
+    {
+        None = 0,
+        Infinity = 1
+    }
+
+    [Serializable]
+    public struct SleightRecipe
+    {
+        public SleightType sleight;
+        public RhythmInputType[] sequence;
+    }
+
     public class RhythmInputHandler : MonoBehaviour
     {
         [Header("References")]
@@ -12,24 +34,68 @@ namespace ImPulse.Core
         public int maxCombo = 4;
         public int CurrentCombo { get; private set; } = 0;
         
-        // Expose the finisher state so other scripts don't have to calculate it
         public bool IsFinisher => CurrentCombo == maxCombo && maxCombo > 0;
+
+        [Header("Sleight Settings")]
+        public List<SleightRecipe> sleightRecipes = new List<SleightRecipe>();
+        
+        // The specific sleight that the player is currently allowed to trigger
+        public SleightType ActiveSleight { get; set; } = SleightType.None;
+        
+        public SleightType TriggeredSleight { get; private set; } = SleightType.None;
 
         [Header("Timing Settings")]
         public double forgivenessWindow = 0.100;
 
-        // Combo Events for UI
         public event Action OnComboAdvanced;
         public event Action OnComboDropped;
-
-        // Generic events
+        public event Action<SleightType> OnSleightTriggered;
         public event Action<int, string> OnInputSuccess;
         public event Action OnInputMiss;
 
         private int _lastHitStepIndex = -1;
+        private Dictionary<int, SleightType> _sleightsDictionary = new Dictionary<int, SleightType>();
+        private List<RhythmInputType> _currentInputBuffer = new List<RhythmInputType>();
 
-        public bool ProcessInput()
+        private void Awake()
         {
+            InitializeSleights();
+        }
+
+        private void InitializeSleights()
+        {
+            _sleightsDictionary.Clear();
+            foreach (var recipe in sleightRecipes)
+            {
+                if (recipe.sequence != null && recipe.sequence.Length > 0)
+                {
+                    int hash = HashSequence(recipe.sequence);
+                    if (!_sleightsDictionary.ContainsKey(hash))
+                    {
+                        _sleightsDictionary.Add(hash, recipe.sleight);
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogWarning($"[RhythmInputHandler] Duplicate Sleight sequence hash detected for {recipe.sleight}!");
+                    }
+                }
+            }
+        }
+
+        public static int HashSequence(IList<RhythmInputType> sequence)
+        {
+            int hash = 0;
+            for (int i = 0; i < sequence.Count; i++)
+            {
+                hash = (hash * 4) + (int)sequence[i];
+            }
+            return hash;
+        }
+
+        public bool ProcessInput(RhythmInputType inputType)
+        {
+            TriggeredSleight = SleightType.None;
+
             if (audioHandler == null || audioHandler.currentPattern == null || audioHandler.currentPattern.Length == 0) 
             {
                 TriggerMiss();
@@ -87,10 +153,26 @@ namespace ImPulse.Core
             if (CurrentCombo >= maxCombo)
             {
                 CurrentCombo = 0; 
+                _currentInputBuffer.Clear();
             }
             
             CurrentCombo++;
+            _currentInputBuffer.Add(inputType);
             OnComboAdvanced?.Invoke();
+
+            if (IsFinisher)
+            {
+                int currentHash = HashSequence(_currentInputBuffer);
+                if (_sleightsDictionary.TryGetValue(currentHash, out SleightType matchedSleight))
+                {
+                    // Only execute if the combo matches the currently rolled/stashed sleight
+                    if (matchedSleight == ActiveSleight)
+                    {
+                        TriggeredSleight = matchedSleight;
+                        OnSleightTriggered?.Invoke(matchedSleight);
+                    }
+                }
+            }
 
             double bestStepTime = bestStep * secPerStep;
             double timingDifference = currentPositionSec - bestStepTime;
@@ -111,6 +193,9 @@ namespace ImPulse.Core
 
         public void DropCombo()
         {
+            TriggeredSleight = SleightType.None;
+            _currentInputBuffer.Clear();
+
             if (CurrentCombo > 0)
             {
                 CurrentCombo = 0;

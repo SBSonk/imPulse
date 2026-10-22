@@ -12,14 +12,13 @@ namespace ImPulse.Weapons
         [Header("Ranged Properties")]
         public GameObject projectilePrefab;
         public float projectileSpeed = 20f;
-        public float maxRange = 15f;
-        public float lifeTime = 5f;
-
+        public int projectilePierce = 1;
+        public float lifeTime = 5f; 
+ 
         [Header("Finisher Properties")]
         public GameObject finisherProjectilePrefab; 
         public float finisherSpeed = 22f;
-        [Tooltip("The angle in degrees between the center, left, and right projectiles.")]
-        public float finisherSpreadAngle = 20f; 
+        public int finisherProjectilePierce = 1;
 
         [Header("Animations")]
         public string fireAnimation;

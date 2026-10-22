@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c5c245017d3f2c4892fb2e5306021ac, type: 3}
+  m_Name: BasicGun
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.BasicGun
+  weaponName: Basic Gun
+  attackCancelTime: 0.3
+  attackDuration: 0.6
+  damage: 5
+  stunLength: 0.25
+  knockbackStrength: 5
+  finisherDamage: 10
+  finisherStunLength: 0.5
+  finisherKnockbackStrength: 8
+  mistimedDamageMultiplier: 0.25
+  fireDelay: 0.1
+  finisherDelay: 0.2
+  projectilePrefab: {fileID: 8268035126565580521, guid: b06aadc95358d60438a6c58214627137, type: 3}
+  projectileSpeed: 20
+  projectilePierce: 1
+  lifeTime: 5
+  finisherProjectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
+  finisherSpeed: 22
+  finisherProjectilePierce: 3
+  fireAnimation: BowShoot1
+  finisherAnimation: BowShoot2
+  bulletCount: 1
+  spreadAngle: 0
+  finisherBulletCount: 3
+  finisherSpreadAngle: 10

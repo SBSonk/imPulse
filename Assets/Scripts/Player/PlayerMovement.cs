@@ -50,7 +50,7 @@ namespace ImPulse.Player
         GameManager _gameManager;
 
         public Action OnDashStart;
-        public Action OnDashEnd; // Added for PlayerAttack to listen to
+        public Action OnDashEnd; 
 
         private Vector3 _currentInputDirection;
         private Vector3 _dashDirection;
@@ -69,7 +69,6 @@ namespace ImPulse.Player
         private bool _dashTriggered;
         private bool _hasStateControl = true;
         
-        // State lock for upgrades
         private bool _isUpgrading = false;
 
         void Start()
@@ -123,8 +122,9 @@ namespace ImPulse.Player
 
         public void OnDash(InputValue value)
         {
-            // Block dash if currently upgrading
-            if (value.isPressed && _currentInputDirection.sqrMagnitude > 0.01f && _currentState != MovementState.Stunned && !_isUpgrading)
+            if (_isUpgrading) return;
+
+            if (value.isPressed && _currentInputDirection.sqrMagnitude > 0.01f && _currentState != MovementState.Stunned)
             {
                 if (_currentStamina >= dashStaminaCost)
                 {
@@ -147,17 +147,19 @@ namespace ImPulse.Player
             {
                 case MovementState.Idle:
                     if (_currentInputDirection.sqrMagnitude > 0.01f) _currentState = MovementState.Moving;
-                    break;
+                break;
+
                 case MovementState.Moving:
                     if (_currentInputDirection.sqrMagnitude <= 0.01f) _currentState = MovementState.Idle;
-                    break;
+                break;
+
                 case MovementState.Dashing:
                     if (_dashTimer >= dashDuration)
                     {
                         _currentState = _currentInputDirection.sqrMagnitude > 0.01f ? MovementState.Moving : MovementState.Idle;
-                        OnDashEnd?.Invoke(); // Signals PlayerAttack that dashing is over
+                        OnDashEnd?.Invoke(); 
                     }
-                    break;
+                break;
             }
         }
 
@@ -167,42 +169,58 @@ namespace ImPulse.Player
             {
                 case MovementState.Idle:
                     ApplyFriction(frictionRate);
-                    break;
+                break;
+
                 case MovementState.Moving:
                     ApplyFriction(frictionRate);
                     Accelerate(_currentInputDirection, moveSpeed, accelerationRate);
+
                     FaceMoveDirection(_currentInputDirection);
-                    break;
+                break;
+
                 case MovementState.Dashing:
                     _dashTimer += Time.deltaTime;
+
                     float dashNormTime = Mathf.Clamp01(_dashTimer / dashDuration);
                     float dashEase = Easing.Evaluate(dashEaseType, dashNormTime);
+
                     Vector3 pureDashVelocity = _dashDirection * dashInitialSpeed;
                     Vector3 targetNormalVelocity = _currentInputDirection * moveSpeed;
+
                     _currentVelocity = Vector3.Lerp(pureDashVelocity, targetNormalVelocity, dashEase);
+
                     FaceMoveDirection(_dashDirection);
-                    break;
+                break;
+
                 case MovementState.InAttack:
                     _attackTimer += Time.deltaTime;
+
                     float attackNormTime = Mathf.Clamp01(_attackTimer / attackControlRegenDuration);
                     float attackEase = Easing.Evaluate(attackEaseType, attackNormTime);
+
                     Vector3 frozenVelocity = Vector3.Lerp(_attackStartVelocity, Vector3.zero, attackEase);
                     Vector3 inputTargetVelocity = _currentInputDirection * moveSpeed;
+
                     _currentVelocity = Vector3.Lerp(frozenVelocity, inputTargetVelocity, attackEase);
+
                     if (_currentInputDirection.sqrMagnitude > 0.01f && attackEase > .9f) FaceMoveDirection(_currentInputDirection);
-                    break;
+                break;
+
                 case MovementState.Stunned:
                     _stunTimer += Time.deltaTime;
+
                     float stunNormTime = Mathf.Clamp01(_stunTimer / _stunDuration);
                     float stunEase = Easing.Evaluate(knockbackEaseType, stunNormTime);
+
                     Vector3 baseVelocity = _currentInputDirection * moveSpeed;
                     _currentVelocity = Vector3.Lerp(_knockbackStartVelocity, baseVelocity, stunEase);
+
                     if (_stunTimer >= _stunDuration)
                     {
                         _hasStateControl = true;
                         _currentState = _currentInputDirection.sqrMagnitude > 0.01f ? MovementState.Moving : MovementState.Idle;
                     }
-                    break;
+                break;
             }
         }
 
@@ -226,7 +244,7 @@ namespace ImPulse.Player
 
             OnDashStart?.Invoke();
 
-            if (_rhythmInputHandler != null) _rhythmInputHandler.ProcessInput();
+            if (_rhythmInputHandler != null) _rhythmInputHandler.ProcessInput(RhythmInputType.Dash);
         }
 
         void ApplyFriction(float friction)
