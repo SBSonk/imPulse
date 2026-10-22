@@ -86,12 +86,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 544144ee2493d864dae7fcd41c0652b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.SymphonyMiniboss
-  maxHealth: 50
+  maxHealth: 150
   hitInvincibilityDuration: 0
   damage: 10
   knockbackStrength: 5
   stunLength: 0.5
-  moveSpeed: 3
+  moveSpeed: 1
   knockbackEase: 5
   minDistance: 6
   maxDistance: 10

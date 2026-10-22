@@ -156,12 +156,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fe376f655cbc3d4bac8194dc952ec6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.BasicShooterEnemy
-  maxHealth: 30
+  maxHealth: 20
   hitInvincibilityDuration: 0
   damage: 10
   knockbackStrength: 5
   stunLength: 0.5
-  moveSpeed: 3
+  moveSpeed: 2
   knockbackEase: 5
   minDistance: 5
   maxDistance: 8

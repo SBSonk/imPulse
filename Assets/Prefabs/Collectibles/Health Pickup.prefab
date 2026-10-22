@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 6085769723035278577}
   - component: {fileID: 3754504958583389964}
   - component: {fileID: 7544590763539084128}
-  - component: {fileID: 8464964025747628050}
   - component: {fileID: 7622966861733327378}
+  - component: {fileID: -6000480349259456899}
   m_Layer: 0
   m_Name: Health Pickup
   m_TagString: Untagged
@@ -92,24 +92,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8464964025747628050
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4424476337467200557}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dabf8aeef6114d349aa18c702649544b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Collectibles.XPPickup
-  layer: 3
-  colliderType: 0
-  radius: 0.3
-  layersToCheck: 0
-  magnetRadius: 3
-  magnetSpeed: 15
 --- !u!114 &7622966861733327378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,3 +105,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Helpers.Rotate
   rotationSpeed: {x: 15, y: 45, z: 15}
+--- !u!114 &-6000480349259456899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4424476337467200557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad041e1aeb01f3343b39b4201f054ee9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Collectibles.HealthPickup
+  layer: 4
+  colliderType: 0
+  radius: 0.3
+  layersToCheck: 0
+  magnetRadius: 0.1
+  magnetSpeed: 15
+  healAmount: 15

@@ -104,11 +104,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dabf8aeef6114d349aa18c702649544b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Collectibles.XPPickup
-  layer: 3
+  layer: 4
   colliderType: 0
   radius: 0.3
   layersToCheck: 0
-  magnetRadius: 3
+  magnetRadius: 0.1
   magnetSpeed: 15
 --- !u!114 &2822503874862447292
 MonoBehaviour:

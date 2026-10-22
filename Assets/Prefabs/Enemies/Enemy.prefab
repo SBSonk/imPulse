@@ -155,12 +155,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c24251feaeea1468dab57cd187072f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.BasicWalkingEnemy
-  maxHealth: 50
+  maxHealth: 25
   hitInvincibilityDuration: 0
   damage: 10
   knockbackStrength: 5
   stunLength: 0.5
-  moveSpeed: 1
+  moveSpeed: 3
   knockbackEase: 5
   spriteRenderer: {fileID: 0}
   deathParticlePrefab: {fileID: 0}

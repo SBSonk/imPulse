@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a318668f3af3914882f957f33e3d6f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.DashingEnemy
-  maxHealth: 30
+  maxHealth: 18
   hitInvincibilityDuration: 0
   damage: 10
   knockbackStrength: 5
