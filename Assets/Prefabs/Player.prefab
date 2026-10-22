@@ -427,6 +427,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   equippedMeleeWeapon: {fileID: 11400000, guid: 13485d2f03fc79f43b158e9f2d9e360d, type: 2}
   equippedRangedWeapon: {fileID: 11400000, guid: 90fd1aba68360ba4daa8147ec5c8652d, type: 2}
+  unlockedSleights: 
+  currentStashedSleight: 0
+  _isSleightOnCooldown: 0
+  _sleightCooldownTimer: 0
   attackCancelTime: 0.1
   attackDuration: 0.6
   bulletOrigin: {fileID: 720283469167586470}

@@ -73,6 +73,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   audioHandler: {fileID: 3168450250169822059}
   maxCombo: 4
+  sleightRecipes:
+  - sleight: 1
+    sequence: 01000000010000000300000003000000i
   forgivenessWindow: 0.25
 --- !u!82 &1146771892514541968
 AudioSource:
@@ -270,9 +273,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a68cdf24ffe1c24aa00265a7cb5e785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Core.UpgradeManager
-  maxUpgradeChoices: 4
-  availableUpgrades:
-  - {fileID: 11400000, guid: de9b032bcc54bc84eb7494664342fa46, type: 2}
-  - {fileID: 11400000, guid: a3ca005ede1e2df4da72fb1ae2ed3be9, type: 2}
+  statUpgradeChoices: 2
+  weaponUpgradeChoices: 2
+  statUpgrades:
   - {fileID: 11400000, guid: 8e60e16c3c64c064cba4aa0773dd8ef8, type: 2}
   - {fileID: 11400000, guid: 26b6ecf200acf9245b4504044d9210dc, type: 2}
+  - {fileID: 11400000, guid: de9b032bcc54bc84eb7494664342fa46, type: 2}
+  - {fileID: 11400000, guid: a3ca005ede1e2df4da72fb1ae2ed3be9, type: 2}
+  weaponUpgrades:
+  - {fileID: 11400000, guid: f7fa8c207c6e39c458acde9b89cb8e1b, type: 2}
