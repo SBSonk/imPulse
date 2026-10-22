@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88276e4bf2d91254eb3494884cae3e36, type: 3}
+  m_Name: Base Difficulty
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Data.DifficultySettings
+  timeBetweenWaves: 3
+  spawnRadius: 15
+  baseTotalEnemies: 10
+  baseMaxAlive: 5
+  baseSpawnInterval: 2
+  baseGroupSize: 1
+  totalEnemiesMultiplier: 1.1
+  maxAliveIncrement: 1
+  spawnIntervalDecay: 0.95
+  minSpawnInterval: 0.25
+  groupSizeIncreaseRate: 1
+  healthScalingRate: 0.1
+  roundCheckpoints:
+  - roundTrigger: 1
+    enemyPool:
+    - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      spawnWeight: 100
+      xpYield: 10
+      scoreYield: 100
+      maxAliveAtOnce: 0
+  - roundTrigger: 3
+    enemyPool:
+    - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      spawnWeight: 75
+      xpYield: 10
+      scoreYield: 100
+      maxAliveAtOnce: 0
+    - enemyPrefab: {fileID: 1005421516619163857, guid: 5e15d1a997b866e45b2ecd9706dcff8e, type: 3}
+      spawnWeight: 25
+      xpYield: 20
+      scoreYield: 250
+      maxAliveAtOnce: 3
+  - roundTrigger: 6
+    enemyPool:
+    - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      spawnWeight: 60
+      xpYield: 10
+      scoreYield: 100
+      maxAliveAtOnce: 0
+    - enemyPrefab: {fileID: 1005421516619163857, guid: 5e15d1a997b866e45b2ecd9706dcff8e, type: 3}
+      spawnWeight: 25
+      xpYield: 20
+      scoreYield: 250
+      maxAliveAtOnce: 4
+    - enemyPrefab: {fileID: 1776579971943887870, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      spawnWeight: 15
+      xpYield: 15
+      scoreYield: 200
+      maxAliveAtOnce: 2
+  - roundTrigger: 10
+    enemyPool:
+    - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      spawnWeight: 60
+      xpYield: 10
+      scoreYield: 100
+      maxAliveAtOnce: 0
+    - enemyPrefab: {fileID: 1005421516619163857, guid: 5e15d1a997b866e45b2ecd9706dcff8e, type: 3}
+      spawnWeight: 25
+      xpYield: 20
+      scoreYield: 250
+      maxAliveAtOnce: 4
+    - enemyPrefab: {fileID: 1776579971943887870, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      spawnWeight: 15
+      xpYield: 15
+      scoreYield: 200
+      maxAliveAtOnce: 2
+    - enemyPrefab: {fileID: 8533227643389552945, guid: 631ab305ee2dd494facd8d3549cf2031, type: 3}
+      spawnWeight: 5
+      xpYield: 50
+      scoreYield: 1000
+      maxAliveAtOnce: 1
+  - roundTrigger: 12
+    enemyPool:
+    - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
+      spawnWeight: 60
+      xpYield: 10
+      scoreYield: 100
+      maxAliveAtOnce: 0
+    - enemyPrefab: {fileID: 1005421516619163857, guid: 5e15d1a997b866e45b2ecd9706dcff8e, type: 3}
+      spawnWeight: 25
+      xpYield: 20
+      scoreYield: 250
+      maxAliveAtOnce: 6
+    - enemyPrefab: {fileID: 1776579971943887870, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
+      spawnWeight: 15
+      xpYield: 15
+      scoreYield: 200
+      maxAliveAtOnce: 5
+    - enemyPrefab: {fileID: 8533227643389552945, guid: 631ab305ee2dd494facd8d3549cf2031, type: 3}
+      spawnWeight: 5
+      xpYield: 50
+      scoreYield: 1000
+      maxAliveAtOnce: 1

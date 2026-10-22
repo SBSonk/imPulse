@@ -23,25 +23,8 @@ namespace ImPulse.Core
     {
         public static EnemyWaveSpawner Instance;
 
-        [Header("Wave Configuration")]
-        [SerializeField] private List<EnemySpawnData> enemyTypes;
-        [SerializeField] private float timeBetweenWaves = 3f;
-        [SerializeField] private float spawnRadius = 15f;
-
-        [Header("Base Stats (Round 1)")]
-        [SerializeField] private int baseTotalEnemies = 10;
-        [SerializeField] private int baseMaxAlive = 5;
-        [SerializeField] private float baseSpawnInterval = 2f;
-        [SerializeField] private int baseGroupSize = 1;
-
-        [Header("Scaling Multipliers")]
-        [SerializeField] private float totalEnemiesMultiplier = 1.2f;
-        [SerializeField] private int maxAliveIncrement = 2;
-        [SerializeField] private float spawnIntervalDecay = 0.9f;
-        [SerializeField] private float minSpawnInterval = 0.2f;
-        [Tooltip("How many rounds before the group size increases by 1.")]
-        [SerializeField] private int groupSizeIncreaseRate = 3;
-        [SerializeField] private float healthScalingRate = 0.15f;
+        [Header("Configuration")]
+        [SerializeField] private DifficultySettings difficultySettings;
 
         [Header("State (Read Only)")]
         public int currentRound = 1;
@@ -54,6 +37,7 @@ namespace ImPulse.Core
         GameManager _gameManager;
         Transform _playerTransform;
 
+        // Current Scaling 
         private int _currentTotalEnemies;
         private int _currentMaxAlive;
         private float _currentSpawnInterval;
@@ -63,7 +47,8 @@ namespace ImPulse.Core
         private float _spawnTimer = 0f;
         private bool _isWaitingForNextRound = false;
 
-        // Tracking active instances per type
+        // Current Active Pool
+        private List<EnemySpawnData> _currentEnemyPool = new List<EnemySpawnData>();
         private int[] _aliveCountPerType;
         private Dictionary<Enemy, int> _activeEnemyTypeMap = new Dictionary<Enemy, int>();
 
@@ -83,8 +68,12 @@ namespace ImPulse.Core
             _gameManager = FindAnyObjectByType<GameManager>();
             _playerTransform = FindAnyObjectByType<PlayerMovement>().transform;
             
-            _aliveCountPerType = new int[enemyTypes.Count];
-            
+            if (difficultySettings == null)
+            {
+                UnityEngine.Debug.LogError("[EnemyWaveSpawner] Difficulty Settings not assigned!");
+                return;
+            }
+
             StartWave(1);
         }
 
@@ -116,6 +105,7 @@ namespace ImPulse.Core
             _enemiesSpawnedThisRound = 0;
             
             ApplyRoundScaling();
+            CheckForPoolUpdate(round);
             
             _spawnTimer = _currentSpawnInterval;
             _isRoundActive = true;
@@ -124,11 +114,34 @@ namespace ImPulse.Core
 
         private void ApplyRoundScaling()
         {
-            _currentTotalEnemies = Mathf.RoundToInt(baseTotalEnemies * Mathf.Pow(totalEnemiesMultiplier, currentRound - 1));
-            _currentMaxAlive = baseMaxAlive + ((currentRound - 1) * maxAliveIncrement);
-            _currentSpawnInterval = Mathf.Max(minSpawnInterval, baseSpawnInterval * Mathf.Pow(spawnIntervalDecay, currentRound - 1));
-            _currentGroupSize = baseGroupSize + ((currentRound - 1) / Mathf.Max(1, groupSizeIncreaseRate));
-            _currentHealthModifier = 1f + ((currentRound - 1) * healthScalingRate);
+            _currentTotalEnemies = Mathf.RoundToInt(difficultySettings.baseTotalEnemies * Mathf.Pow(difficultySettings.totalEnemiesMultiplier, currentRound - 1));
+            _currentMaxAlive = difficultySettings.baseMaxAlive + ((currentRound - 1) * difficultySettings.maxAliveIncrement);
+            _currentSpawnInterval = Mathf.Max(difficultySettings.minSpawnInterval, difficultySettings.baseSpawnInterval * Mathf.Pow(difficultySettings.spawnIntervalDecay, currentRound - 1));
+            _currentGroupSize = difficultySettings.baseGroupSize + ((currentRound - 1) / Mathf.Max(1, difficultySettings.groupSizeIncreaseRate));
+            _currentHealthModifier = 1f + ((currentRound - 1) * difficultySettings.healthScalingRate);
+        }
+
+        private void CheckForPoolUpdate(int round)
+        {
+            if (difficultySettings.roundCheckpoints == null) return;
+
+            foreach (var checkpoint in difficultySettings.roundCheckpoints)
+            {
+                if (checkpoint.roundTrigger == round)
+                {
+                    UpdateEnemyPool(checkpoint.enemyPool);
+                    break; 
+                }
+            }
+        }
+
+        private void UpdateEnemyPool(List<EnemySpawnData> newPool)
+        {
+            _currentEnemyPool = new List<EnemySpawnData>(newPool);
+            
+            _aliveCountPerType = new int[_currentEnemyPool.Count];
+            _activeEnemyTypeMap.Clear();
+            _enemiesCurrentlyAlive = 0; 
         }
 
         private void SpawnGroup()
@@ -137,7 +150,6 @@ namespace ImPulse.Core
 
             for (int i = 0; i < amountToSpawn; i++)
             {
-                // Break out early if no eligible enemies can be spawned due to type caps
                 if (!SpawnSingleEnemy()) break; 
             }
         }
@@ -150,7 +162,7 @@ namespace ImPulse.Core
             }
             
             Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
-            Vector3 spawnPos = _playerTransform.position + new Vector3(randomDir.x, randomDir.y, 0f) * spawnRadius;
+            Vector3 spawnPos = _playerTransform.position + new Vector3(randomDir.x, randomDir.y, 0f) * difficultySettings.spawnRadius;
 
             GameObject enemyObj = null;
             if (ObjectPooler.Instance != null)
@@ -162,8 +174,7 @@ namespace ImPulse.Core
                 enemyObj = Instantiate(dataToSpawn.enemyPrefab.gameObject, spawnPos, Quaternion.identity);
             }
 
-            Enemy enemyScript = enemyObj.GetComponent<Enemy>();
-            if (enemyScript != null)
+            if (enemyObj.TryGetComponent<Enemy>(out var enemyScript))
             {
                 enemyScript.InitializeWaveStats(_currentHealthModifier, dataToSpawn.xpYield, dataToSpawn.scoreYield);
                 enemyScript.OnEnemyDied += HandleEnemyDeath;
@@ -171,7 +182,6 @@ namespace ImPulse.Core
                 _enemiesCurrentlyAlive++;
                 _enemiesSpawnedThisRound++;
                 
-                // Track this specific enemy type
                 _aliveCountPerType[typeIndex]++;
                 _activeEnemyTypeMap.TryAdd(enemyScript, typeIndex);
             }
@@ -185,12 +195,11 @@ namespace ImPulse.Core
             selectedData = default;
             float totalWeight = 0;
             
-            // Only weigh types that haven't hit their max local cap
-            for (int i = 0; i < enemyTypes.Count; i++)
+            for (int i = 0; i < _currentEnemyPool.Count; i++)
             {
-                if (enemyTypes[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < enemyTypes[i].maxAliveAtOnce)
+                if (_currentEnemyPool[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < _currentEnemyPool[i].maxAliveAtOnce)
                 {
-                    totalWeight += enemyTypes[i].spawnWeight;
+                    totalWeight += _currentEnemyPool[i].spawnWeight;
                 }
             }
 
@@ -198,27 +207,26 @@ namespace ImPulse.Core
 
             float randomVal = UnityEngine.Random.Range(0f, totalWeight);
             
-            for (int i = 0; i < enemyTypes.Count; i++)
+            for (int i = 0; i < _currentEnemyPool.Count; i++)
             {
-                if (enemyTypes[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < enemyTypes[i].maxAliveAtOnce)
+                if (_currentEnemyPool[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < _currentEnemyPool[i].maxAliveAtOnce)
                 {
-                    if (randomVal < enemyTypes[i].spawnWeight)
+                    if (randomVal < _currentEnemyPool[i].spawnWeight)
                     {
                         selectedIndex = i;
-                        selectedData = enemyTypes[i];
+                        selectedData = _currentEnemyPool[i];
                         return true;
                     }
-                    randomVal -= enemyTypes[i].spawnWeight;
+                    randomVal -= _currentEnemyPool[i].spawnWeight;
                 }
             }
 
-            // Fallback to first available uncapped type
-            for (int i = 0; i < enemyTypes.Count; i++)
+            for (int i = 0; i < _currentEnemyPool.Count; i++)
             {
-                if (enemyTypes[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < enemyTypes[i].maxAliveAtOnce)
+                if (_currentEnemyPool[i].maxAliveAtOnce == 0 || _aliveCountPerType[i] < _currentEnemyPool[i].maxAliveAtOnce)
                 {
                     selectedIndex = i;
-                    selectedData = enemyTypes[i];
+                    selectedData = _currentEnemyPool[i];
                     return true;
                 }
             }
@@ -231,7 +239,6 @@ namespace ImPulse.Core
             deadEnemy.OnEnemyDied -= HandleEnemyDeath;
             _enemiesCurrentlyAlive--;
 
-            // Free up the local cap limit for this enemy type
             if (_activeEnemyTypeMap.TryGetValue(deadEnemy, out int typeIndex))
             {
                 _aliveCountPerType[typeIndex]--;
@@ -250,7 +257,7 @@ namespace ImPulse.Core
             _isRoundActive = false;
             _isWaitingForNextRound = true;
             
-            yield return new WaitForSeconds(timeBetweenWaves);
+            yield return new WaitForSeconds(difficultySettings.timeBetweenWaves);
 
             StartWave(currentRound + 1);
         }

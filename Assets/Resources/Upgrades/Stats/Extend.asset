@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Extend
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.HealthCapacityUpgrade
   upgradeName: Extend
-  description: Increases your max health.
+  descriptions:
+  - Increase your health capacity!
   isRepeatable: 1
   isInfinitelyRepeatable: 0
   maxLevel: 3

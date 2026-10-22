@@ -9,9 +9,9 @@ namespace ImPulse.Player
         [SerializeField] float dashInvincibilityTime = .25f;
 
         [Header("Dynamic Damage Reduction")]
-        [SerializeField] [Range(0f, 1f)] float startReductionThreshold = 0.30f;
-        [SerializeField] [Range(0f, 1f)] float maxReductionThreshold = 0.10f;
-        [SerializeField] [Range(0f, 1f)] float maxDamageReduction = 0.50f;
+        [SerializeField, Range(0f, 1f)] float startReductionThreshold = 0.30f;
+        [SerializeField, Range(0f, 1f)] float maxReductionThreshold = 0.10f;
+        [SerializeField, Range(0f, 1f)] float maxDamageReduction = 0.50f;
 
         private Animator _animator;
         private PlayerMovement _playerMovement;

@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Unwind
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.StaminaRegenUpgrade
   upgradeName: Unwind
-  description: Increases your stamina regen rate.
+  descriptions:
+  - Rest faster, stamina regen increased!
   isRepeatable: 1
   isInfinitelyRepeatable: 0
   maxLevel: 3

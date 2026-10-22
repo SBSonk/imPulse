@@ -18,18 +18,22 @@ MonoBehaviour:
   damage: 5
   stunLength: 0.25
   knockbackStrength: 5
+  mistimedDamageMultiplier: 0.25
   finisherDamage: 10
   finisherStunLength: 0.5
   finisherKnockbackStrength: 8
-  mistimedDamageMultiplier: 0.25
   fireDelay: 0.1
   finisherDelay: 0.2
   projectilePrefab: {fileID: 8268035126565580521, guid: a48c6976f885bd74aa96768dabb08df3, type: 3}
   projectileSpeed: 10
-  maxRange: 15
+  projectilePierce: 1
   lifeTime: 5
   finisherProjectilePrefab: {fileID: 8268035126565580521, guid: a48c6976f885bd74aa96768dabb08df3, type: 3}
   finisherSpeed: 22
-  finisherSpreadAngle: 20
+  finisherProjectilePierce: 1
   fireAnimation: BowShoot1
   finisherAnimation: BowShoot2
+  bulletCount: 1
+  spreadAngle: 15
+  finisherBulletCount: 3
+  finisherSpreadAngle: 20

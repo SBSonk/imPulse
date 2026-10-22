@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Endura
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.StaminaCapacityUpgrade
   upgradeName: Endura
-  description: Increases your max stamina.
+  descriptions:
+  - Increase your stamina capacity!
   isRepeatable: 1
   isInfinitelyRepeatable: 0
   maxLevel: 3

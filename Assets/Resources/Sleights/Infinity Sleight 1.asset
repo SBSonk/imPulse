@@ -15,13 +15,13 @@ MonoBehaviour:
   weaponName: Infinity Sleight 1
   attackCancelTime: 0.3
   attackDuration: 0.6
-  damage: 20
+  damage: 15
   stunLength: 0.25
   knockbackStrength: 5
-  cooldown: 5
+  cooldown: 20
   animationName: SleightAnim
   sleightDelay: 0.2
-  projectilePrefab: {fileID: 8268035126565580521, guid: 05844d5dc77f6f94bb89f80e8afdc728, type: 3}
+  projectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
   projectileSpeed: 10
   projectilePierce: 1
   lifeTime: 5

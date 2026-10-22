@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b5495febda64cc45b821a7901f5fc41, type: 3}
+  m_Name: Basic Sword
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.WeaponUpgrade
+  upgradeName: Sword Sharpening
+  descriptions:
+  - Increases base damage and significantly boosts finisher damage. Finishers now apply a slightly longer stun.
+  - Major increase to raw attack power. Finishers hit significantly harder and knock enemies back further, granting more breathing room.
+  - Maximum damage and stun duration.
+  isRepeatable: 1
+  isInfinitelyRepeatable: 0
+  maxLevel: 3
+  slotToUpgrade: 0
+  weaponTiers:
+  - {fileID: 11400000, guid: 43a8970e7ed9dbf4bab5a7eee9249895, type: 2}
+  - {fileID: 11400000, guid: ac9dfde9e3384fe48b610f45a15e641a, type: 2}
+  - {fileID: 11400000, guid: 93ece60c556242e47bf2f17cde7a5a51, type: 2}

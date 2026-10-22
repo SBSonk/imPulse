@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b6dc7e33149efe649bf7a6157af42f69, type: 3}
-  m_Name: New Basic Sword
+  m_Name: Basic Sword 1
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Weapons.BasicSword
-  weaponName: New Weapon
+  weaponName: Basic Sword
   attackCancelTime: 0.3
   attackDuration: 0.6
-  damage: 20
-  stunLength: 0.5
-  knockbackStrength: 10
-  finisherDamage: 30
-  finisherStunLength: 0.5
-  finisherKnockbackStrength: 8
+  damage: 12
+  stunLength: 0.2
+  knockbackStrength: 5
   mistimedDamageMultiplier: 0.25
+  finisherDamage: 25
+  finisherStunLength: 0.6
+  finisherKnockbackStrength: 10
   attackDelay: 0.1
   finisherDelay: 0.3
   hitRadius: 1

@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.SleightUpgrade
   upgradeName: Infinity
   descriptions:
-  - Create a volley of homing bullets around you.
-  - Increases the amount of homing bullets.
-  - Increases the bullet piercing and damage values.
+  - Unleashes a rapid-fire spiral of 12 piercing projectiles around you. (20s Cooldown)
+  - Doubles the bullet count to 24 and fires twice as fast. Cooldown is reduced to 16 seconds.
+  - Fires a wave of 36 high-damage projectiles that actively home in on nearby targets. Cooldown reduced to 12 seconds.
   isRepeatable: 1
   isInfinitelyRepeatable: 0
   maxLevel: 3
   sleightType: 1
   weaponTiers:
   - {fileID: 11400000, guid: 8b04e761d020586449ed9fc22b6d38ed, type: 2}
-  - {fileID: 11400000, guid: 8b04e761d020586449ed9fc22b6d38ed, type: 2}
-  - {fileID: 11400000, guid: 8b04e761d020586449ed9fc22b6d38ed, type: 2}
+  - {fileID: 11400000, guid: 1fdeee417a30b4049963bb3cc4d51642, type: 2}
+  - {fileID: 11400000, guid: e6da601bd3d3fd8439aa40e9a9fc2934, type: 2}

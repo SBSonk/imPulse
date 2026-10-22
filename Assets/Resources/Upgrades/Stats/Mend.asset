@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Mend
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.HealUpgrade
   upgradeName: Mend
-  description: Heals 50% of your total health.
+  descriptions:
+  - Heals 50% of your max health!
   isRepeatable: 1
   isInfinitelyRepeatable: 1
   maxLevel: -1

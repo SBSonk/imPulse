@@ -262,8 +262,8 @@ MonoBehaviour:
   radius: 0.15
   layersToCheck: 2
   hitVFXPrefab: {fileID: 0}
-  homingTurnSpeed: 360
-  homingDelay: 0
+  homingTurnSpeed: 180
+  homingDelay: 0.1
   stopHomingAfterTime: 1
   homingDuration: 3
   targetLayer: 2
