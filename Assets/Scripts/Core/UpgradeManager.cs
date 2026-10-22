@@ -17,9 +17,12 @@ namespace ImPulse.Core
         public static UpgradeManager Instance { get; private set; }
 
         [Header("Upgrade Configuration")]
-        public int maxUpgradeChoices = 3;
+        public int statUpgradeChoices = 2;
+        public int weaponUpgradeChoices = 2;
         
-        public List<UpgradeData> availableUpgrades = new List<UpgradeData>(); 
+        [Header("Upgrade Pools")]
+        public List<UpgradeData> statUpgrades = new List<UpgradeData>(); 
+        public List<UpgradeData> weaponUpgrades = new List<UpgradeData>(); 
 
         private Dictionary<UpgradeData, UpgradeState> _upgradeStates = new Dictionary<UpgradeData, UpgradeState>();
         
@@ -44,7 +47,13 @@ namespace ImPulse.Core
 
         private void InitializeStates()
         {
-            foreach (var upgrade in availableUpgrades)
+            InitializePool(statUpgrades);
+            InitializePool(weaponUpgrades);
+        }
+
+        private void InitializePool(List<UpgradeData> pool)
+        {
+            foreach (var upgrade in pool)
             {
                 if (upgrade != null && !_upgradeStates.ContainsKey(upgrade))
                 {
@@ -55,9 +64,33 @@ namespace ImPulse.Core
 
         public List<UpgradeData> GetUpgradesForLevel()
         {
-            List<UpgradeData> validUpgrades = new List<UpgradeData>();
+            List<UpgradeData> validStats = GetValidUpgrades(statUpgrades);
+            List<UpgradeData> validWeapons = GetValidUpgrades(weaponUpgrades);
 
-            foreach (var upgrade in availableUpgrades)
+            ShuffleList(validStats);
+            ShuffleList(validWeapons);
+
+            List<UpgradeData> choices = new List<UpgradeData>();
+
+            int statsToPull = Mathf.Min(statUpgradeChoices, validStats.Count);
+            for (int i = 0; i < statsToPull; i++)
+            {
+                choices.Add(validStats[i]);
+            }
+
+            int weaponsToPull = Mathf.Min(weaponUpgradeChoices, validWeapons.Count);
+            for (int i = 0; i < weaponsToPull; i++)
+            {
+                choices.Add(validWeapons[i]);
+            }
+
+            return choices;
+        }
+
+        private List<UpgradeData> GetValidUpgrades(List<UpgradeData> pool)
+        {
+            List<UpgradeData> validUpgrades = new List<UpgradeData>();
+            foreach (var upgrade in pool)
             {
                 if (upgrade != null && _upgradeStates.TryGetValue(upgrade, out UpgradeState state))
                 {
@@ -67,18 +100,18 @@ namespace ImPulse.Core
                     }
                 }
             }
+            return validUpgrades;
+        }
 
-            List<UpgradeData> choices = new List<UpgradeData>();
-            if (validUpgrades.Count == 0) return choices;
-
-            int amount = Mathf.Min(maxUpgradeChoices, validUpgrades.Count);
-            
-            for (int i = 0; i < amount; i++)
+        private void ShuffleList(List<UpgradeData> list)
+        {
+            for (int i = 0; i < list.Count; i++)
             {
-                choices.Add(validUpgrades[i]);
+                UpgradeData temp = list[i];
+                int randomIndex = UnityEngine.Random.Range(i, list.Count);
+                list[i] = list[randomIndex];
+                list[randomIndex] = temp;
             }
-
-            return choices;
         }
 
         public void ApplyUpgrade(UpgradeData upgrade)
@@ -91,7 +124,6 @@ namespace ImPulse.Core
                 {
                     state.currentLevel++;
 
-                    // Mark as retired only if it isn't infinitely repeatable and has reached its cap
                     if (!upgrade.isRepeatable || (!upgrade.isInfinitelyRepeatable && state.currentLevel >= upgrade.maxLevel))
                     {
                         state.isRetired = true;

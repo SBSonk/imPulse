@@ -3,7 +3,7 @@ using ImPulse.Player;
 
 namespace ImPulse.Weapons
 {
-    public abstract class RangedWeapon : Weapon
+    public abstract class RangedWeapon : NormalWeapon
     {
         [Header("Timing")]
         public float fireDelay = 0.1f;

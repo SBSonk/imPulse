@@ -39,8 +39,19 @@ namespace ImPulse.Core
         [Header("Sleight Settings")]
         public List<SleightRecipe> sleightRecipes = new List<SleightRecipe>();
         
-        // The specific sleight that the player is currently allowed to trigger
-        public SleightType ActiveSleight { get; set; } = SleightType.None;
+        private SleightType _activeSleight = SleightType.None;
+        public SleightType ActiveSleight 
+        { 
+            get => _activeSleight;
+            set
+            {
+                if (_activeSleight != value)
+                {
+                    _activeSleight = value;
+                    OnActiveSleightChanged?.Invoke(_activeSleight);
+                }
+            }
+        }
         
         public SleightType TriggeredSleight { get; private set; } = SleightType.None;
 
@@ -49,9 +60,12 @@ namespace ImPulse.Core
 
         public event Action OnComboAdvanced;
         public event Action OnComboDropped;
+        public event Action<SleightType> OnActiveSleightChanged;
         public event Action<SleightType> OnSleightTriggered;
         public event Action<int, string> OnInputSuccess;
         public event Action OnInputMiss;
+
+        public IReadOnlyList<RhythmInputType> CurrentInputBuffer => _currentInputBuffer;
 
         private int _lastHitStepIndex = -1;
         private Dictionary<int, SleightType> _sleightsDictionary = new Dictionary<int, SleightType>();
@@ -92,11 +106,20 @@ namespace ImPulse.Core
             return hash;
         }
 
+        public SleightRecipe GetRecipe(SleightType type)
+        {
+            foreach (var recipe in sleightRecipes)
+            {
+                if (recipe.sleight == type) return recipe;
+            }
+            return default;
+        }
+
         public bool ProcessInput(RhythmInputType inputType)
         {
             TriggeredSleight = SleightType.None;
 
-            if (audioHandler == null || audioHandler.currentPattern == null || audioHandler.currentPattern.Length == 0) 
+            if (audioHandler == null || audioHandler.currentPattern == null || audioHandler.currentPattern.Length == 0)
             {
                 TriggerMiss();
                 return false;
@@ -145,14 +168,14 @@ namespace ImPulse.Core
             if (bestStep == _lastHitStepIndex)
             {
                 TriggerMiss();
-                return false; 
+                return false;
             }
 
             _lastHitStepIndex = bestStep;
 
             if (CurrentCombo >= maxCombo)
             {
-                CurrentCombo = 0; 
+                CurrentCombo = 0;
                 _currentInputBuffer.Clear();
             }
             
@@ -165,7 +188,6 @@ namespace ImPulse.Core
                 int currentHash = HashSequence(_currentInputBuffer);
                 if (_sleightsDictionary.TryGetValue(currentHash, out SleightType matchedSleight))
                 {
-                    // Only execute if the combo matches the currently rolled/stashed sleight
                     if (matchedSleight == ActiveSleight)
                     {
                         TriggeredSleight = matchedSleight;
@@ -207,7 +229,7 @@ namespace ImPulse.Core
         {
             int length = audioHandler.currentPattern.Length;
             int mod = stepIndex % length;
-            if (mod < 0) mod += length; 
+            if (mod < 0) mod += length;
             return audioHandler.currentPattern[mod];
         }
     }

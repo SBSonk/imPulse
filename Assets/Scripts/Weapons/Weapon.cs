@@ -11,6 +11,7 @@ namespace ImPulse.Weapons
         [Header("Timing Stats (Fire Rate)")]
         [Tooltip("How long before the player can input the next attack to continue the combo.")]
         public float attackCancelTime = 0.3f;
+        
         [Tooltip("How long the attack state actually lasts before movement is naturally restored.")]
         public float attackDuration = 0.6f;
 
@@ -18,14 +19,6 @@ namespace ImPulse.Weapons
         public float damage = 10;
         public float stunLength = .25f;
         public float knockbackStrength = 5f;
-
-        [Header("Finisher Stats")]
-        public float finisherDamage = 15f;
-        public float finisherStunLength = 0.5f;
-        public float finisherKnockbackStrength = 8f;
-
-        [Header("Modifiers")]
-        public float mistimedDamageMultiplier = 0.25f;
 
         public abstract void OnAttack(Transform playerTransform, AttackState state, int comboIndex, bool isOnBeat);
         public abstract void OnFinisher(Transform playerTransform, AttackState state, bool isOnBeat);

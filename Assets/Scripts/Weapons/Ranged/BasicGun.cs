@@ -20,8 +20,7 @@ namespace ImPulse.Weapons
 
         public override void OnAttack(Transform playerTransform, AttackState state, int comboIndex, bool isOnBeat)
         {
-            MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
-            if (runner != null)
+            if (playerTransform.TryGetComponent<MonoBehaviour>(out var runner))
             {
                 runner.StartCoroutine(FireRoutine(playerTransform, isOnBeat));
             }
@@ -29,8 +28,7 @@ namespace ImPulse.Weapons
 
         public override void OnFinisher(Transform playerTransform, AttackState state, bool isOnBeat)
         {
-            MonoBehaviour runner = playerTransform.GetComponent<MonoBehaviour>();
-            if (runner != null)
+            if (playerTransform.TryGetComponent<MonoBehaviour>(out var runner))
             {
                 runner.StartCoroutine(FinisherRoutine(playerTransform, isOnBeat));
             }
@@ -38,11 +36,11 @@ namespace ImPulse.Weapons
 
         private Vector3 GetOriginPos(Transform root)
         {
-            PlayerAttack pAttack = root.GetComponent<PlayerAttack>();
-            if (pAttack != null && pAttack.GetBulletOrigin() != null) return pAttack.GetBulletOrigin().position;
+            if (root.TryGetComponent<PlayerAttack>(out var pAttack) && pAttack.GetBulletOrigin() != null) 
+                return pAttack.GetBulletOrigin().position;
 
-            BasicShooterEnemy enemy = root.GetComponent<BasicShooterEnemy>();
-            if (enemy != null) return enemy.GetBulletOrigin().position;
+            if (root.TryGetComponent<BasicShooterEnemy>(out var enemy)) 
+                return enemy.GetBulletOrigin().position;
 
             return root.position;
         }
@@ -101,9 +99,8 @@ namespace ImPulse.Weapons
         {
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             GameObject projObj = ObjectPooler.Instance.Get(prefab, startPos, Quaternion.Euler(0, 0, angle));
-            Projectile projectile = projObj.GetComponent<Projectile>();
             
-            if (projectile != null)
+            if (projObj.TryGetComponent<Projectile>(out var projectile))
             {
                 projectile.InitializeProjectile(speed, dmg, stun, knockback, lifeTime, pierces);
                 projectile.Fire(direction);

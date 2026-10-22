@@ -11,7 +11,7 @@ namespace ImPulse.Upgrades
         [Header("Sleight Settings")]
         public SleightType sleightType;
         
-        public Weapon[] weaponTiers;
+        public SleightWeapon[] weaponTiers;
 
         public override void ApplyUpgrade(GameObject player, int currentLevel)
         {
@@ -22,7 +22,7 @@ namespace ImPulse.Upgrades
                 if (weaponTiers != null && weaponTiers.Length > 0)
                 {
                     int index = GetTierIndex(currentLevel, weaponTiers.Length);
-                    Weapon upgradedWeapon = weaponTiers[index];
+                    SleightWeapon upgradedWeapon = weaponTiers[index];
                     
                     playerAttack.UpdateSleightWeapon(sleightType, upgradedWeapon);
                     UnityEngine.Debug.Log($"[SleightUpgrade] {sleightType} is now Level {currentLevel}, using weapon: {upgradedWeapon.weaponName}");

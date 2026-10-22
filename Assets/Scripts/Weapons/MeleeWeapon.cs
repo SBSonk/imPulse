@@ -4,7 +4,7 @@ using ImPulse.Core;
 
 namespace ImPulse.Weapons
 {
-    public abstract class MeleeWeapon : Weapon
+    public abstract class MeleeWeapon : NormalWeapon
     {
         [Header("Timing")]
         public float attackDelay = 0.1f;

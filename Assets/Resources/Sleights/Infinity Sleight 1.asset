@@ -15,24 +15,16 @@ MonoBehaviour:
   weaponName: Infinity Sleight 1
   attackCancelTime: 0.3
   attackDuration: 0.6
-  damage: 10
+  damage: 20
   stunLength: 0.25
   knockbackStrength: 5
-  finisherDamage: 15
-  finisherStunLength: 0.5
-  finisherKnockbackStrength: 8
-  mistimedDamageMultiplier: 0.25
-  fireDelay: 0.1
-  finisherDelay: 0.2
-  projectilePrefab: {fileID: 8268035126565580521, guid: b06aadc95358d60438a6c58214627137, type: 3}
-  projectileSpeed: 20
+  cooldown: 5
+  animationName: SleightAnim
+  sleightDelay: 0.2
+  projectilePrefab: {fileID: 8268035126565580521, guid: 05844d5dc77f6f94bb89f80e8afdc728, type: 3}
+  projectileSpeed: 10
   projectilePierce: 1
   lifeTime: 5
-  finisherProjectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
-  finisherSpeed: 22
-  finisherProjectilePierce: 1
-  fireAnimation: 
-  finisherAnimation: 
   bulletCount: 12
   spawnRadiusOffset: 0.75
   timeBetweenShots: 0.05

@@ -2,7 +2,6 @@ using ImPulse.Core;
 using ImPulse.Weapons;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
 using System.Collections.Generic;
 
 namespace ImPulse.Player
@@ -21,24 +20,11 @@ namespace ImPulse.Player
         Ranged
     }
 
-    [Serializable]
-    public struct SleightWeaponMapping
-    {
-        public SleightType sleight;
-        public Weapon sleightWeapon;
-        public string animationName;
-        public float cooldown;
-    }
-
     public class PlayerAttack : MonoBehaviour
     {
         [Header("Equipped Weapons")]
         public Weapon equippedMeleeWeapon;
         public Weapon equippedRangedWeapon;
-
-        [Header("Sleight Arsenal (Master List)")]
-        [Tooltip("Define all possible sleights and their base animations/cooldowns here.")]
-        public List<SleightWeaponMapping> sleightWeapons = new List<SleightWeaponMapping>();
         
         [Header("Sleight State (Read Only)")]
         public List<SleightType> unlockedSleights = new List<SleightType>();
@@ -67,7 +53,7 @@ namespace ImPulse.Player
         bool _isUpgrading = false;
         bool _isDashing = false;
 
-        private Dictionary<SleightType, SleightWeaponMapping> _sleightMap = new Dictionary<SleightType, SleightWeaponMapping>();
+        private Dictionary<SleightType, SleightWeapon> _sleightMap = new Dictionary<SleightType, SleightWeapon>();
 
         void Awake()
         {
@@ -85,14 +71,6 @@ namespace ImPulse.Player
             if (_rhythmInputHandler != null)
             {
                 _rhythmInputHandler.OnSleightTriggered += ExecuteSpecialSleight;
-            }
-
-            foreach (var mapping in sleightWeapons)
-            {
-                if (!_sleightMap.ContainsKey(mapping.sleight))
-                {
-                    _sleightMap.Add(mapping.sleight, mapping);
-                }
             }
         }
 
@@ -175,7 +153,6 @@ namespace ImPulse.Player
             }
         }
 
-        // --- UPGRADE API --- //
         public void ChangeWeapon(WeaponSlot slot, Weapon newWeapon)
         {
             if (slot == WeaponSlot.Melee)
@@ -201,17 +178,10 @@ namespace ImPulse.Player
             }
         }
 
-        public void UpdateSleightWeapon(SleightType sleight, Weapon newWeapon)
+        public void UpdateSleightWeapon(SleightType sleight, SleightWeapon newWeapon)
         {
-            if (_sleightMap.TryGetValue(sleight, out SleightWeaponMapping mapping))
-            {
-                mapping.sleightWeapon = newWeapon;
-                _sleightMap[sleight] = mapping;
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning($"[PlayerAttack] Cannot update weapon for {sleight}. It is not defined in the Sleight Arsenal inspector list.");
-            }
+            // Now safely adds it directly to the dictionary if it's newly unlocked, or updates the existing tier
+            _sleightMap[sleight] = newWeapon;
         }
 
         private void HandleHealthChanged(float currentHealth, float maxHealth)
@@ -281,19 +251,27 @@ namespace ImPulse.Player
             bool isFinisher = _rhythmInputHandler.IsFinisher;
             int attackIndex = Mathf.Max(0, _rhythmInputHandler.CurrentCombo - 1);
 
-            MeleeWeapon meleeWeapon = equippedMeleeWeapon as MeleeWeapon;
-            RangedWeapon rangedWeapon = equippedRangedWeapon as RangedWeapon;
             string animToPlay = "";
 
             if (isRanged)
             {
-                if (rangedWeapon != null) animToPlay = isFinisher ? rangedWeapon.finisherAnimation : rangedWeapon.fireAnimation;
+                if (equippedRangedWeapon is RangedWeapon rWeapon) 
+                {
+                    animToPlay = isFinisher ? rWeapon.finisherAnimation : rWeapon.fireAnimation;
+                }
             }
             else 
             {
-                if (meleeWeapon != null && meleeWeapon.comboAnimations != null && meleeWeapon.comboAnimations.Length > 0)
+                if (equippedMeleeWeapon is MeleeWeapon mWeapon)
                 {
-                    animToPlay = isFinisher ? meleeWeapon.finisherAnimation : meleeWeapon.comboAnimations[attackIndex % meleeWeapon.comboAnimations.Length];
+                    if (isFinisher) 
+                    {
+                        animToPlay = mWeapon.finisherAnimation;
+                    }
+                    else if (mWeapon.comboAnimations != null && mWeapon.comboAnimations.Length > 0)
+                    {
+                        animToPlay = mWeapon.comboAnimations[attackIndex % mWeapon.comboAnimations.Length];
+                    }
                 }
             }
 
@@ -317,22 +295,19 @@ namespace ImPulse.Player
 
         public void ExecuteSpecialSleight(SleightType sleight)
         {
-            if (!_sleightMap.TryGetValue(sleight, out SleightWeaponMapping mapping)) return;
+            if (!_sleightMap.TryGetValue(sleight, out SleightWeapon sleightWeapon)) return;
 
             _currentState = AttackState.Special;
             _timeSinceLastAttack = 0f;
 
             if (_playerMovement != null && !_isDashing) _playerMovement.EnterAttackState();
             
-            if (_animator != null && !string.IsNullOrEmpty(mapping.animationName)) 
+            if (_animator != null && !string.IsNullOrEmpty(sleightWeapon.animationName)) 
             {
-                _animator.Play(mapping.animationName, 0, 0f);
+                _animator.Play(sleightWeapon.animationName, 0, 0f);
             }
 
-            if (mapping.sleightWeapon != null)
-            {
-                mapping.sleightWeapon.OnFinisher(transform, _currentState, isOnBeat: true);
-            }
+            sleightWeapon.ExecuteSleight(transform, _currentState);
 
             if (_rhythmInputHandler != null) 
             {
@@ -341,7 +316,7 @@ namespace ImPulse.Player
             }
             
             currentStashedSleight = SleightType.None;
-            _sleightCooldownTimer = mapping.cooldown;
+            _sleightCooldownTimer = sleightWeapon.cooldown;
             _isSleightOnCooldown = true;
         }
 

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c699f540d619a144bff40a355b35f7e, type: 3}
+  m_Name: Infinity
+  m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.SleightUpgrade
+  upgradeName: Infinity
+  descriptions:
+  - Create a volley of homing bullets around you.
+  - Increases the amount of homing bullets.
+  - Increases the bullet piercing and damage values.
+  isRepeatable: 1
+  isInfinitelyRepeatable: 0
+  maxLevel: 3
+  sleightType: 1
+  weaponTiers:
+  - {fileID: 11400000, guid: 8b04e761d020586449ed9fc22b6d38ed, type: 2}
+  - {fileID: 11400000, guid: 8b04e761d020586449ed9fc22b6d38ed, type: 2}
+  - {fileID: 11400000, guid: 8b04e761d020586449ed9fc22b6d38ed, type: 2}
