@@ -4,6 +4,7 @@ using UnityEngine;
 using ImPulse.Core.Pooling; 
 using ImPulse.Enemies;
 using ImPulse.Player;
+using ImPulse.Collectibles;
 using System;
 
 namespace ImPulse.Core
@@ -25,6 +26,12 @@ namespace ImPulse.Core
 
         [Header("Configuration")]
         [SerializeField] private DifficultySettings difficultySettings;
+
+        [Header("Drops")]
+        [SerializeField] private GameObject xpPickupPrefab;
+        [SerializeField] private GameObject healthPickupPrefab;
+        [Tooltip("Percentage chance (0 to 1) an enemy drops a health pickup.")]
+        [SerializeField] private float healthDropChance = 0.05f;
 
         [Header("State (Read Only)")]
         public int currentRound = 1;
@@ -239,6 +246,28 @@ namespace ImPulse.Core
             deadEnemy.OnEnemyDied -= HandleEnemyDeath;
             _enemiesCurrentlyAlive--;
 
+            if (xpPickupPrefab != null && ObjectPooler.Instance != null)
+            {
+                GameObject xpObj = ObjectPooler.Instance.Get(xpPickupPrefab, deadEnemy.transform.position, Quaternion.identity);
+                if (xpObj.TryGetComponent<XPPickup>(out var xpPickup))
+                {
+                    xpPickup.Initialize(xpYield);
+                }
+            }
+            else if (_gameManager != null)
+            {
+                _gameManager.AddXP(xpYield); // Fallback if no prefab is assigned
+            }
+
+            if (healthPickupPrefab != null && ObjectPooler.Instance != null)
+            {
+                if (UnityEngine.Random.value <= healthDropChance)
+                {
+                    Vector3 offset = (Vector3)UnityEngine.Random.insideUnitCircle * 0.5f;
+                    ObjectPooler.Instance.Get(healthPickupPrefab, deadEnemy.transform.position + offset, Quaternion.identity);
+                }
+            }
+
             if (_activeEnemyTypeMap.TryGetValue(deadEnemy, out int typeIndex))
             {
                 _aliveCountPerType[typeIndex]--;
@@ -247,7 +276,6 @@ namespace ImPulse.Core
 
             if (_gameManager != null)
             {
-                _gameManager.AddXP(xpYield);
                 _gameManager.AddScore(scoreYield);
             }
         }

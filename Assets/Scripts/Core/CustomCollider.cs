@@ -10,7 +10,8 @@ namespace ImPulse.Core
         Player,
         Enemy,
         Projectile,
-        Environment
+        Environment,
+        Pickup
     }
 
     [Flags]
@@ -21,6 +22,7 @@ namespace ImPulse.Core
         Enemy = 1 << 1,
         Projectile = 1 << 2,
         Environment = 1 << 3,
+        Pickup = 1 << 4,
         All = ~0
     }
 
