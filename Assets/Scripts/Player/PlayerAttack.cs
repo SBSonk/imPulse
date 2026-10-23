@@ -41,6 +41,8 @@ namespace ImPulse.Player
         [Header("State (Read Only)")]
         [SerializeField] AttackState _currentState = AttackState.Idle;
 
+        AudioSource _sfxSource;
+
         Animator _animator;
         PlayerMovement _playerMovement;
         RhythmInputHandler _rhythmInputHandler;
@@ -72,6 +74,12 @@ namespace ImPulse.Player
             {
                 _rhythmInputHandler.OnSleightTriggered += ExecuteSpecialSleight;
             }
+
+            if (!TryGetComponent<AudioSource>(out var _)) gameObject.AddComponent<AudioSource>();
+            _sfxSource = GetComponent<AudioSource>();
+
+            _sfxSource.loop = false;
+            _sfxSource.playOnAwake = false;
         }
 
         void Start()
@@ -180,7 +188,6 @@ namespace ImPulse.Player
 
         public void UpdateSleightWeapon(SleightType sleight, SleightWeapon newWeapon)
         {
-            // Now safely adds it directly to the dictionary if it's newly unlocked, or updates the existing tier
             _sleightMap[sleight] = newWeapon;
         }
 
@@ -252,17 +259,18 @@ namespace ImPulse.Player
             int attackIndex = Mathf.Max(0, _rhythmInputHandler.CurrentCombo - 1);
 
             string animToPlay = "";
+            Weapon activeWeapon = isRanged ? equippedRangedWeapon : equippedMeleeWeapon;
 
             if (isRanged)
             {
-                if (equippedRangedWeapon is RangedWeapon rWeapon) 
+                if (activeWeapon is RangedWeapon rWeapon) 
                 {
                     animToPlay = isFinisher ? rWeapon.finisherAnimation : rWeapon.fireAnimation;
                 }
             }
             else 
             {
-                if (equippedMeleeWeapon is MeleeWeapon mWeapon)
+                if (activeWeapon is MeleeWeapon mWeapon)
                 {
                     if (isFinisher) 
                     {
@@ -272,6 +280,15 @@ namespace ImPulse.Player
                     {
                         animToPlay = mWeapon.comboAnimations[attackIndex % mWeapon.comboAnimations.Length];
                     }
+                }
+            }
+
+            if (activeWeapon != null && _sfxSource != null)
+            {
+                AudioClip clipToPlay = activeWeapon.attackSFX;
+                if (clipToPlay != null)
+                {
+                    _sfxSource.PlayOneShot(clipToPlay, activeWeapon.soundVolume);
                 }
             }
 
@@ -305,6 +322,11 @@ namespace ImPulse.Player
             if (_animator != null && !string.IsNullOrEmpty(sleightWeapon.animationName)) 
             {
                 _animator.Play(sleightWeapon.animationName, 0, 0f);
+            }
+
+            if (_sfxSource != null && sleightWeapon.attackSFX != null)
+            {
+                _sfxSource.PlayOneShot(sleightWeapon.attackSFX, sleightWeapon.soundVolume);
             }
 
             sleightWeapon.ExecuteSleight(transform, _currentState);

@@ -158,6 +158,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Enemies.BasicShooterEnemy
   maxHealth: 20
   hitInvincibilityDuration: 0
+  hitSound: {fileID: 0}
+  deathSound: {fileID: 8300000, guid: 6f85843e10cf2b747b30d043d36a2fb7, type: 3}
+  hitVolume: 1
+  deathVolume: 0.25
   damage: 10
   knockbackStrength: 5
   stunLength: 0.5

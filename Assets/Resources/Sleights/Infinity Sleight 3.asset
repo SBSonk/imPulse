@@ -18,6 +18,8 @@ MonoBehaviour:
   damage: 30
   stunLength: 0.25
   knockbackStrength: 5
+  attackSFX: {fileID: 8300000, guid: 6f85843e10cf2b747b30d043d36a2fb7, type: 3}
+  soundVolume: 1
   cooldown: 12
   animationName: SleightAnim
   sleightDelay: 0.2

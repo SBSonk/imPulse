@@ -110,6 +110,8 @@ MonoBehaviour:
   layersToCheck: 0
   magnetRadius: 0.1
   magnetSpeed: 15
+  collectSound: {fileID: 8300000, guid: 1e5edc938ee66f442841f24b569dba56, type: 3}
+  collectVolume: 1
 --- !u!114 &2822503874862447292
 MonoBehaviour:
   m_ObjectHideFlags: 0

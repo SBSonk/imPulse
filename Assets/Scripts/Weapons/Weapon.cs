@@ -20,6 +20,10 @@ namespace ImPulse.Weapons
         public float stunLength = .25f;
         public float knockbackStrength = 5f;
 
+        [Header("Audio")]
+        public AudioClip attackSFX;
+        [Range(0f, 1f)] public float soundVolume = 1f;
+
         public abstract void OnAttack(Transform playerTransform, AttackState state, int comboIndex, bool isOnBeat);
         public abstract void OnFinisher(Transform playerTransform, AttackState state, bool isOnBeat);
     }

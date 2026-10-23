@@ -396,3 +396,5 @@ MonoBehaviour:
   ease: 15
   hoverScaleMultiplier: 1.1
   maxHoverTime: 0.15
+  hoverSound: {fileID: 8300000, guid: 35b34494f80e6844b8b317e30c6a146b, type: 3}
+  selectSound: {fileID: 8300000, guid: 54f4560d4c42ff44f82a1f88a702895c, type: 3}

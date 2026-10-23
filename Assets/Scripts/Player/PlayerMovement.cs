@@ -41,6 +41,10 @@ namespace ImPulse.Player
         [Header("Knockback Settings")]
         [SerializeField] EaseType knockbackEaseType = EaseType.OutCubic;
 
+        [Header("Audio")]
+        [SerializeField] AudioClip dashSound;
+        [Range(0f, 1f)] [SerializeField] float dashVolume = 1f;
+
         [Header("State")]
         [SerializeField] MovementState _currentState = MovementState.Idle;
         [SerializeField] Vector3 _currentVelocity;
@@ -52,24 +56,34 @@ namespace ImPulse.Player
         public Action OnDashStart;
         public Action OnDashEnd; 
 
-        private Vector3 _currentInputDirection;
-        private Vector3 _dashDirection;
-        private float _dashTimer;
+        Vector3 _currentInputDirection;
+        Vector3 _dashDirection;
+        float _dashTimer;
         
-        private float _currentStamina;
-        private float _baseMaxStamina; 
+        float _currentStamina;
+        float _baseMaxStamina; 
         
-        private Vector3 _attackStartVelocity;
-        private float _attackTimer;
+        Vector3 _attackStartVelocity;
+        float _attackTimer;
 
-        private Vector3 _knockbackStartVelocity;
-        private float _stunDuration;
-        private float _stunTimer;
+        Vector3 _knockbackStartVelocity;
+        float _stunDuration;
+        float _stunTimer;
 
-        private bool _dashTriggered;
-        private bool _hasStateControl = true;
+        bool _dashTriggered;
+        bool _hasStateControl = true;
         
-        private bool _isUpgrading = false;
+        bool _isUpgrading = false;
+        AudioSource _audioSource;
+
+        void Awake()
+        {
+            if (!TryGetComponent<AudioSource>(out var _)) gameObject.AddComponent<AudioSource>();
+            _audioSource = GetComponent<AudioSource>();
+
+            _audioSource.loop = false;
+            _audioSource.playOnAwake = false;
+        }
 
         void Start()
         {
@@ -96,10 +110,10 @@ namespace ImPulse.Player
             }
         }
 
-        private void HandleUpgradeStart(int level) => _isUpgrading = true;
-        private void HandleUpgradeFinish() => _isUpgrading = false;
+        void HandleUpgradeStart(int level) => _isUpgrading = true;
+        void HandleUpgradeFinish() => _isUpgrading = false;
 
-        private void Update()
+        void Update()
         {
             if (_currentStamina < maxStamina)
             {
@@ -133,7 +147,7 @@ namespace ImPulse.Player
             }
         }
 
-        private void UpdateStateTransitions()
+        void UpdateStateTransitions()
         {
             if (_dashTriggered)
             {
@@ -163,7 +177,7 @@ namespace ImPulse.Player
             }
         }
 
-        private void ExecuteCurrentState()
+        void ExecuteCurrentState()
         {
             switch (_currentState)
             {
@@ -241,6 +255,12 @@ namespace ImPulse.Player
             _currentStamina -= dashStaminaCost;
 
             if (_playerStatus != null) _playerStatus.GrantInvincibility(dashDuration);
+
+            // --- Play Dash Sound ---
+            if (dashSound != null && _audioSource != null)
+            {
+                _audioSource.PlayOneShot(dashSound, dashVolume);
+            }
 
             OnDashStart?.Invoke();
 

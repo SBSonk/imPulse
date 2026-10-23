@@ -2,6 +2,7 @@ using UnityEngine;
 using ImPulse.Core;
 using ImPulse.Player;
 using ImPulse.Core.Pooling;
+using ImPulse.Helpers;
 
 namespace ImPulse.Collectibles
 {
@@ -10,6 +11,10 @@ namespace ImPulse.Collectibles
         [Header("Magnet Settings")]
         public float magnetRadius = 3f;
         public float magnetSpeed = 15f;
+
+        [Header("Audio")]
+        [SerializeField] private AudioClip collectSound;
+        [Range(0f, 1f)] [SerializeField] private float collectVolume = 1f;
 
         protected GameObject _sourcePrefab;
         private Transform _playerTransform;
@@ -59,6 +64,8 @@ namespace ImPulse.Collectibles
         {
             if (other.TryGetComponent<HasHealth>(out var playerHealth))
             {
+                if (collectSound) AudioHelper.PlayDetached2DSound(collectSound, collectVolume);
+
                 Collect(other.gameObject);
                 ReturnToPool();
             }

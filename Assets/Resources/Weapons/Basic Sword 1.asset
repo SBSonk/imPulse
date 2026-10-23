@@ -18,6 +18,8 @@ MonoBehaviour:
   damage: 12
   stunLength: 0.2
   knockbackStrength: 5
+  attackSFX: {fileID: 8300000, guid: d731abee8c24a38458bab7f6e708891f, type: 3}
+  soundVolume: 0.125
   mistimedDamageMultiplier: 0.25
   finisherDamage: 25
   finisherStunLength: 0.6

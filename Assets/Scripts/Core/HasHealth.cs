@@ -1,4 +1,5 @@
 using System;
+using ImPulse.Helpers;
 using UnityEngine;
 
 namespace ImPulse.Core
@@ -12,15 +13,28 @@ namespace ImPulse.Core
         [Tooltip("How long the entity is invincible after taking damage.")]
         public float hitInvincibilityDuration = 0f;
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip hitSound;
+        [SerializeField] private AudioClip deathSound;
+        [Range(0f, 1f)] [SerializeField] private float hitVolume = 1f;
+        [Range(0f, 1f)] [SerializeField] private float deathVolume = 1f;
+
         public event Action<float, float> OnHealthChanged;
         public event Action OnDeath;
 
+        AudioSource _audioSource;
         protected bool _isDead = false;
         protected float _invincibilityTimer = 0f;
 
         protected virtual void Awake()
         {
             currentHealth = maxHealth;
+            
+            if (!TryGetComponent<AudioSource>(out var _)) gameObject.AddComponent<AudioSource>();
+            _audioSource = GetComponent<AudioSource>();
+
+            _audioSource.loop = false;
+            _audioSource.playOnAwake = false;
         }
 
         protected virtual void Update()
@@ -44,9 +58,17 @@ namespace ImPulse.Core
             {
                 Die();
             }
-            else if (hitInvincibilityDuration > 0f)
+            else 
             {
-                GrantInvincibility(hitInvincibilityDuration);
+                if (hitSound != null && _audioSource != null)
+                {
+                    _audioSource.PlayOneShot(hitSound, hitVolume);
+                }
+
+                if (hitInvincibilityDuration > 0f)
+                {
+                    GrantInvincibility(hitInvincibilityDuration);
+                }
             }
 
             return true;
@@ -78,6 +100,9 @@ namespace ImPulse.Core
             if (_isDead) return;
 
             _isDead = true;
+
+            if (deathSound) AudioHelper.PlayDetached2DSound(deathSound, deathVolume);
+
             OnDeath?.Invoke();
         }
     }
