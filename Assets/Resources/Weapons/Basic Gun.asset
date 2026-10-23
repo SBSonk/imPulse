@@ -37,5 +37,5 @@ MonoBehaviour:
   finisherAnimation: BowShoot2
   bulletCount: 1
   spreadAngle: 0
-  finisherBulletCount: 3
+  finisherBulletCount: 2
   finisherSpreadAngle: 15

@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Upgrades.WeaponUpgrade
   upgradeName: Gunpower
   descriptions:
-  - Increases bullet damage and speed. Your finisher spread now pierces through an additional enemy.
-  - Shoot 2 bullets per shot! Finishers hit significantly harder and knock enemies back further. THEY ALSO HOME IN!
-  - Maximum firepower. Finishers unleash a massive 7-bullet spread that pierces up to 3 enemies.
+  - Increases bullet damage and speed. Your finisher gets an extra bullet and the spread now pierces through an additional enemy.
+  - Shoot 2 bullets per shot! Finishers hit significantly harder, gain another bullet and knock enemies back further.
+  - Maximum firepower. Finishers unleash a massive 5-bullet spread that pierces up to 3 enemies.
   isRepeatable: 1
   isInfinitelyRepeatable: 0
   maxLevel: 3

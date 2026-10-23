@@ -51,6 +51,7 @@ namespace ImPulse.Core
         private double _dspSongStartTime;
         private double _secPerBeat;
         
+        private bool _isStarted = false;
         private bool _hasSongStarted = false;
         private int _nextBeatIndex = 0;
         private int _nextHalfBeatIndex = 0;
@@ -65,7 +66,14 @@ namespace ImPulse.Core
             _targetVolume = _audioSource.volume;
             
             _baseBpm = bpm; 
+        }
 
+        public void StartPlaying()
+        {
+            if (_isStarted) return;
+            _isStarted = true;
+
+            _secPerBeat = 60.0 / bpm;
             _dspSongStartTime = AudioSettings.dspTime + startOffset;
             _audioSource.PlayScheduled(_dspSongStartTime);
         }
@@ -77,6 +85,8 @@ namespace ImPulse.Core
             {
                 _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _targetVolume, Time.unscaledDeltaTime * volumeFadeSpeed);
             }
+
+            if (!_isStarted) return;
 
             songPositionInSeconds = AudioSettings.dspTime - _dspSongStartTime;
             songPositionInBeats = songPositionInSeconds / _secPerBeat;
@@ -129,7 +139,7 @@ namespace ImPulse.Core
 
             // If the song is already playing, we must shift the DSP start time backwards or forwards.
             // Otherwise, updating _secPerBeat will instantly drastically alter songPositionInBeats.
-            if (_hasSongStarted)
+            if (_hasSongStarted && _isStarted)
             {
                 _dspSongStartTime = AudioSettings.dspTime - (songPositionInBeats * _secPerBeat);
             }

@@ -30,12 +30,12 @@ MonoBehaviour:
   projectileSpeed: 25
   projectilePierce: 2
   lifeTime: 5
-  finisherProjectilePrefab: {fileID: 8268035126565580521, guid: b06aadc95358d60438a6c58214627137, type: 3}
+  finisherProjectilePrefab: {fileID: 8268035126565580521, guid: 9cef3b8d2e79bf946810ca6572a5443d, type: 3}
   finisherSpeed: 25
   finisherProjectilePierce: 3
   fireAnimation: BowShoot1
   finisherAnimation: BowShoot2
   bulletCount: 2
   spreadAngle: 10
-  finisherBulletCount: 7
+  finisherBulletCount: 5
   finisherSpreadAngle: 30
