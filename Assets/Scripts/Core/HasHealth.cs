@@ -1,5 +1,6 @@
 using System;
 using ImPulse.Helpers;
+using ImPulse.Core.Pooling;
 using UnityEngine;
 
 namespace ImPulse.Core
@@ -18,6 +19,9 @@ namespace ImPulse.Core
         [SerializeField] private AudioClip deathSound;
         [Range(0f, 1f)] [SerializeField] private float hitVolume = 1f;
         [Range(0f, 1f)] [SerializeField] private float deathVolume = 1f;
+
+        [Header("VFX")]
+        [SerializeField] private GameObject deathVFXPrefab;
 
         public event Action<float, float> OnHealthChanged;
         public event Action OnDeath;
@@ -102,6 +106,18 @@ namespace ImPulse.Core
             _isDead = true;
 
             if (deathSound) AudioHelper.PlayDetached2DSound(deathSound, deathVolume);
+
+            if (deathVFXPrefab != null)
+            {
+                if (ObjectPooler.Instance != null)
+                {
+                    ObjectPooler.Instance.Get(deathVFXPrefab, transform.position, Quaternion.identity);
+                }
+                else
+                {
+                    Instantiate(deathVFXPrefab, transform.position, Quaternion.identity);
+                }
+            }
 
             OnDeath?.Invoke();
         }

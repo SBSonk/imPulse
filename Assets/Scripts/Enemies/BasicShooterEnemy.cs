@@ -23,9 +23,6 @@ namespace ImPulse.Enemies
 
         [Header("Visuals")]
         public SpriteRenderer spriteRenderer;
-        
-        [Header("VFX")]
-        public GameObject deathParticlePrefab;
 
         // Changed to protected so child classes can use them
         protected bool _isShooting = false;
@@ -81,16 +78,7 @@ namespace ImPulse.Enemies
         {
             base.OnBeat(beatIndex);
 
-            if (_isDead)
-            {
-                if (ObjectPooler.Instance != null && deathParticlePrefab != null)
-                {
-                    ObjectPooler.Instance.Get(deathParticlePrefab, transform.position, Quaternion.identity);
-                }
-                if (_collider != null) _collider.enabled = false;
-                base.Die(); 
-                return;
-            }
+            if (_isDead) return;
 
             if (shootResolution == PatternResolution.Whole)
             {
@@ -132,6 +120,18 @@ namespace ImPulse.Enemies
                     _comboIndex++;
                 }
             }
+        }
+
+        protected override void Die()
+        {
+            if (_isDead) return;
+
+            if (_collider != null)
+            {
+                _collider.enabled = false;
+            }
+
+            base.Die();
         }
 
         protected override void CollisionEnter(CustomCollider other)

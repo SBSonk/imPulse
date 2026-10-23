@@ -209,8 +209,8 @@ MonoBehaviour:
   levelUpVolume: 0.025
   currentLevel: 1
   currentXP: 0
-  xpToNextLevel: 5
-  xpScaleFactor: 1.5
+  xpToNextLevel: 100
+  xpScaleFactor: 1.15
   score: 0
 --- !u!114 &2502973700155124265
 MonoBehaviour:
@@ -224,39 +224,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d258abe85eec51240bf657a5c8d91822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Core.EnemyWaveSpawner
-  enemyTypes:
-  - enemyPrefab: {fileID: 8163455383493592743, guid: c17972a411b6de24d8de7f84e2f84705, type: 3}
-    spawnWeight: 100
-    xpYield: 1
-    scoreYield: 100
-    maxAliveAtOnce: 6
-  - enemyPrefab: {fileID: 1005421516619163857, guid: 5e15d1a997b866e45b2ecd9706dcff8e, type: 3}
-    spawnWeight: 30
-    xpYield: 2
-    scoreYield: 250
-    maxAliveAtOnce: 2
-  - enemyPrefab: {fileID: 1776579971943887870, guid: 96ea74f7bee5d314dad3cd969bd8f57f, type: 3}
-    spawnWeight: 15
-    xpYield: 2
-    scoreYield: 250
-    maxAliveAtOnce: 1
-  - enemyPrefab: {fileID: 8533227643389552945, guid: 631ab305ee2dd494facd8d3549cf2031, type: 3}
-    spawnWeight: 5
-    xpYield: 5
-    scoreYield: 500
-    maxAliveAtOnce: 1
-  timeBetweenWaves: 3
-  spawnRadius: 10
-  baseTotalEnemies: 10
-  baseMaxAlive: 5
-  baseSpawnInterval: 2
-  baseGroupSize: 1
-  totalEnemiesMultiplier: 1.2
-  maxAliveIncrement: 2
-  spawnIntervalDecay: 0.9
-  minSpawnInterval: 0.2
-  groupSizeIncreaseRate: 3
-  healthScalingRate: 0.15
+  difficultySettings: {fileID: 11400000, guid: 985ee341f300d074e8fc55bbb410feb0, type: 2}
+  xpPickupPrefab: {fileID: 4574074008238329299, guid: 345331579e99da845949fbf2ddd4d399, type: 3}
+  healthPickupPrefab: {fileID: 4424476337467200557, guid: 30c5c059ddaccad489c197077a5337ac, type: 3}
+  healthDropChance: 0.1
   currentRound: 1
   _enemiesSpawnedThisRound: 0
   _enemiesCurrentlyAlive: 0
@@ -282,3 +253,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a3ca005ede1e2df4da72fb1ae2ed3be9, type: 2}
   weaponUpgrades:
   - {fileID: 11400000, guid: f7fa8c207c6e39c458acde9b89cb8e1b, type: 2}
+  - {fileID: 11400000, guid: dae626b8b14cd8d4182e2ef285559c8b, type: 2}
+  - {fileID: 11400000, guid: 813cc3d0f74e15a40aefc13facbc20f4, type: 2}

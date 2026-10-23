@@ -381,6 +381,8 @@ MonoBehaviour:
   attackControlRegenDuration: 0.4
   attackEaseType: 4
   knockbackEaseType: 9
+  dashSound: {fileID: 8300000, guid: e526cf16210a9d84fa212b05c082669d, type: 3}
+  dashVolume: 0.5
   _currentState: 0
   _currentVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &9076429845758582708
@@ -472,7 +474,7 @@ MonoBehaviour:
   layer: 0
   colliderType: 0
   radius: 0.25
-  layersToCheck: 0
+  layersToCheck: 4
 --- !u!114 &5513326066376125285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -487,7 +489,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ImPulse.Player.PlayerStatus
   maxHealth: 50
   hitInvincibilityDuration: 0.25
-  dashInvincibilityTime: 0.25
+  hitSound: {fileID: 8300000, guid: c970a54315c6d4e4fae6c357726bbc50, type: 3}
+  deathSound: {fileID: 8300000, guid: 6f85843e10cf2b747b30d043d36a2fb7, type: 3}
+  hitVolume: 0.5
+  deathVolume: 0.75
+  dashInvincibilityTime: 0.5
   startReductionThreshold: 0.5
   maxReductionThreshold: 0.1
   maxDamageReduction: 0.3

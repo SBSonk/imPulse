@@ -10,9 +10,6 @@ namespace ImPulse.Enemies
     {
         [Header("Visuals")]
         public SpriteRenderer spriteRenderer;
-        
-        [Header("VFX")]
-        public GameObject deathParticlePrefab;
 
         protected override void Awake()
         {
@@ -27,15 +24,12 @@ namespace ImPulse.Enemies
 
             if (_stunTimer > 0f)
             {
-                // Calculate normalized time (0 to 1) for the stun duration
                 float t = Mathf.Clamp01(1f - (_stunTimer / _stunDuration));
                 
-                // Evaluate the easing curve and invert it so velocity decays from 1 to 0
                 float velocityMultiplier = 1f - Easing.Evaluate(knockbackEase, t);
                 
                 Vector3 currentKnockback = _knockbackVelocity * velocityMultiplier;
                 
-                // Ensure knockback remains purely 2D if on the XY plane
                 currentKnockback.z = 0; 
                 transform.position += currentKnockback * Time.deltaTime;
             }
@@ -50,11 +44,6 @@ namespace ImPulse.Enemies
         protected override void Die()
         {
             if (_isDead) return;
-            
-            if (ObjectPooler.Instance != null && deathParticlePrefab != null)
-            {
-                ObjectPooler.Instance.Get(deathParticlePrefab, transform.position, Quaternion.identity);
-            }
 
             if (_collider != null)
             {

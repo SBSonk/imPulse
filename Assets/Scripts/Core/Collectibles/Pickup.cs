@@ -16,6 +16,9 @@ namespace ImPulse.Collectibles
         [SerializeField] private AudioClip collectSound;
         [Range(0f, 1f)] [SerializeField] private float collectVolume = 1f;
 
+        [Header("VFX")]
+        [SerializeField] private GameObject collectVFXPrefab;
+
         protected GameObject _sourcePrefab;
         private Transform _playerTransform;
 
@@ -65,6 +68,18 @@ namespace ImPulse.Collectibles
             if (other.TryGetComponent<HasHealth>(out var playerHealth))
             {
                 if (collectSound) AudioHelper.PlayDetached2DSound(collectSound, collectVolume);
+
+                if (collectVFXPrefab != null)
+                {
+                    if (ObjectPooler.Instance != null)
+                    {
+                        ObjectPooler.Instance.Get(collectVFXPrefab, transform.position, Quaternion.identity);
+                    }
+                    else
+                    {
+                        Instantiate(collectVFXPrefab, transform.position, Quaternion.identity);
+                    }
+                }
 
                 Collect(other.gameObject);
                 ReturnToPool();

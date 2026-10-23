@@ -125,4 +125,5 @@ MonoBehaviour:
   magnetSpeed: 15
   collectSound: {fileID: 8300000, guid: 1e5edc938ee66f442841f24b569dba56, type: 3}
   collectVolume: 1
+  collectVFXPrefab: {fileID: 2459715279710026292, guid: e7fb40c19eb021f428e1bb702831a109, type: 3}
   healAmount: 15

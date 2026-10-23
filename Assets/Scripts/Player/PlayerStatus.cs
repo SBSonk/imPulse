@@ -68,10 +68,7 @@ namespace ImPulse.Player
             
             base.Die();
 
-            UnityEngine.Debug.Log("Player Died! Game Over.");
-
-            if (_playerMovement != null) _playerMovement.enabled = false;
-            if (_playerAttack != null) _playerAttack.enabled = false;
+            gameObject.SetActive(false);
         }
 
         // --- UPGRADE API --- //

@@ -162,6 +162,7 @@ MonoBehaviour:
   deathSound: {fileID: 8300000, guid: 6f85843e10cf2b747b30d043d36a2fb7, type: 3}
   hitVolume: 1
   deathVolume: 0.25
+  deathVFXPrefab: {fileID: 2459715279710026292, guid: c7ec4d40b60b9e948815659afe1c1317, type: 3}
   damage: 10
   knockbackStrength: 5
   stunLength: 0.5

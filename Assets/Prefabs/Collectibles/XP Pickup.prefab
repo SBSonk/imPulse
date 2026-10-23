@@ -112,6 +112,7 @@ MonoBehaviour:
   magnetSpeed: 15
   collectSound: {fileID: 8300000, guid: 1e5edc938ee66f442841f24b569dba56, type: 3}
   collectVolume: 1
+  collectVFXPrefab: {fileID: 2459715279710026292, guid: 6d0d83b115482cd4389f69b5a3900ef7, type: 3}
 --- !u!114 &2822503874862447292
 MonoBehaviour:
   m_ObjectHideFlags: 0
