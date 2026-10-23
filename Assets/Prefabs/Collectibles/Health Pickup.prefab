@@ -121,7 +121,7 @@ MonoBehaviour:
   colliderType: 0
   radius: 0.3
   layersToCheck: 0
-  magnetRadius: 0.1
+  magnetRadius: 0.25
   magnetSpeed: 15
   collectSound: {fileID: 8300000, guid: 1e5edc938ee66f442841f24b569dba56, type: 3}
   collectVolume: 1

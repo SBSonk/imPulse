@@ -25,6 +25,9 @@ namespace ImPulse.Core
         [Header("Audio Settings")]
         [Tooltip("How fast the volume lerps to the target value (units per second).")]
         public float volumeFadeSpeed = 2f;
+        
+        [Tooltip("Global multiplier for the music volume controlled by the player.")]
+        [Range(0f, 1f)] public float masterVolume = 1f;
 
         [Header("Rhythm Pattern")]
         public PatternResolution patternResolution = PatternResolution.Whole;
@@ -36,12 +39,10 @@ namespace ImPulse.Core
 
         public event Action OnSongStart;
         
-        // Fired on every beat regardless of pattern
         public event Action<int> OnBeat;
         public event Action<int> OnHalfBeat;
         public event Action<int> OnQuarterBeat;
 
-        // Fired only when a beat aligns with a 'true' value in the currentPattern array at the chosen resolution
         public event Action<int> OnWholePatternBeat;
         public event Action<int> OnHalfPatternBeat;
         public event Action<int> OnQuarterPatternBeat;
@@ -78,12 +79,18 @@ namespace ImPulse.Core
             _audioSource.PlayScheduled(_dspSongStartTime);
         }
 
+        public void SetMasterVolume(float volume)
+        {
+            masterVolume = Mathf.Clamp01(volume);
+        }
+
         void Update()
         {
-            // Handle gradual volume lerping using unscaled time (immune to slow-motion)
-            if (!Mathf.Approximately(_audioSource.volume, _targetVolume))
+            float actualTargetVolume = _targetVolume * masterVolume;
+
+            if (!Mathf.Approximately(_audioSource.volume, actualTargetVolume))
             {
-                _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _targetVolume, Time.unscaledDeltaTime * volumeFadeSpeed);
+                _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, actualTargetVolume, Time.unscaledDeltaTime * volumeFadeSpeed);
             }
 
             if (!_isStarted) return;
@@ -122,9 +129,6 @@ namespace ImPulse.Core
             }
         }
 
-        /// <summary>
-        /// Dynamically updates the audio pitch and recalculates beat timings without breaking the current progression.
-        /// </summary>
         public void SetPlaybackSpeed(float newSpeed)
         {
             playbackSpeed = Mathf.Clamp(newSpeed, 0.1f, 3f);
@@ -137,17 +141,12 @@ namespace ImPulse.Core
             bpm = _baseBpm * playbackSpeed;
             _secPerBeat = 60.0 / bpm;
 
-            // If the song is already playing, we must shift the DSP start time backwards or forwards.
-            // Otherwise, updating _secPerBeat will instantly drastically alter songPositionInBeats.
             if (_hasSongStarted && _isStarted)
             {
                 _dspSongStartTime = AudioSettings.dspTime - (songPositionInBeats * _secPerBeat);
             }
         }
 
-        /// <summary>
-        /// Sets the target volume. The audio source will gradually lerp to this value in Update.
-        /// </summary>
         public void SetVolume(float newVolume)
         {
             _targetVolume = Mathf.Clamp01(newVolume);

@@ -9,6 +9,7 @@ namespace ImPulse.Core
     {
         Menu,
         Playing,
+        Paused,
         GameOver
     }
 
@@ -23,7 +24,7 @@ namespace ImPulse.Core
 
         [Range(0.1f, 2f)] public float normalTimescale = .8f, levelUpTimescale = .2f;
         [Range(0f, 1f)] public float normalVolume = .8f, levelUpVolume = .2f;
-            
+        
         float _timeScale = .8f;
 
         [Header("Experience & Leveling")]
@@ -35,7 +36,6 @@ namespace ImPulse.Core
         [Header("Scoring")]
         public int score = 0;
 
-        // Events for UI
         public event Action<int, int> OnXPChanged;
         public event Action<int> OnScoreChanged;
         public event Action<int> OnLevelUp;
@@ -61,7 +61,12 @@ namespace ImPulse.Core
 
         void Update()
         {
-            // Listen for global input to transition out of Menu or Game Over states
+            // Fallback keyboard check for pausing in case PlayerInput isn't routing here
+            if (Keyboard.current != null && Keyboard.current.pKey.wasPressedThisFrame)
+            {
+                TogglePause();
+            }
+
             if (currentState == GameState.Menu || currentState == GameState.GameOver)
             {
                 bool startInputDetected = false;
@@ -70,7 +75,7 @@ namespace ImPulse.Core
                 {
                     startInputDetected = true;
                 }
-                else if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+                else if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.enterKey.wasPressedThisFrame))
                 {
                     startInputDetected = true;
                 }
@@ -83,6 +88,18 @@ namespace ImPulse.Core
             }
         }
 
+        public void TogglePause()
+        {
+            if (currentState == GameState.Playing)
+            {
+                SetGameState(GameState.Paused);
+            }
+            else if (currentState == GameState.Paused)
+            {
+                SetGameState(GameState.Playing);
+            }
+        }
+
         public void SetGameState(GameState newState)
         {
             currentState = newState;
@@ -91,15 +108,20 @@ namespace ImPulse.Core
             switch (currentState)
             {
                 case GameState.Menu:
-                    SetTimescale(0);
+                    SetTimescale(0f);
                     if (_audioHandler != null) _audioHandler.SetVolume(0f);
                     break;
                 case GameState.Playing:
                     SetTimescale(normalTimescale);
                     if (_audioHandler != null) _audioHandler.SetVolume(normalVolume);
                     break;
+                case GameState.Paused:
+                    SetTimescale(0f);
+                    // Duck the music slightly while paused
+                    if (_audioHandler != null) _audioHandler.SetVolume(levelUpVolume);
+                    break;
                 case GameState.GameOver:
-                    SetTimescale(0);
+                    SetTimescale(0f);
                     if (_audioHandler != null) _audioHandler.SetVolume(0f);
                     break;
             }
@@ -128,10 +150,7 @@ namespace ImPulse.Core
             currentXP += amount;
             OnXPChanged?.Invoke(currentXP, xpToNextLevel);
 
-            if (currentXP >= xpToNextLevel)
-            {
-                TriggerLevelUp();
-            }
+            if (currentXP >= xpToNextLevel) TriggerLevelUp();
         }
 
         public void AddScore(int amount)
@@ -163,7 +182,11 @@ namespace ImPulse.Core
         {
             _timeScale = timeScale;
             Time.timeScale = timeScale;
-            if (_audioHandler != null) _audioHandler.SetPlaybackSpeed(timeScale);
+            
+            if (timeScale > 0f && _audioHandler != null) 
+            {
+                _audioHandler.SetPlaybackSpeed(timeScale);
+            }
         }
     }
 }

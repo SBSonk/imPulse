@@ -29,12 +29,12 @@ namespace ImPulse.Collectibles
 
         protected virtual void OnEnable()
         {
-            this.CollisionEnter += HandleCollisionEnter;
+            this.CollisionStay += HandleCollisionEnter;
         }
 
         protected virtual void OnDisable()
         {
-            this.CollisionEnter -= HandleCollisionEnter;
+            this.CollisionStay -= HandleCollisionEnter;
         }
 
         public virtual void OnPoolGet(GameObject sourcePrefab)
