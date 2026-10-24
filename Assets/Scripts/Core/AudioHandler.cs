@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace ImPulse.Core
 {
@@ -33,6 +34,8 @@ namespace ImPulse.Core
         public PatternResolution patternResolution = PatternResolution.Whole;
         public bool[] currentPattern = { true, false, true, false };
 
+        [SerializeField] AudioMixer mixer;
+                
         [Header("Playback State (Read Only)")]
         public double songPositionInSeconds;
         public double songPositionInBeats;
@@ -79,14 +82,9 @@ namespace ImPulse.Core
             _audioSource.PlayScheduled(_dspSongStartTime);
         }
 
-        public void SetMasterVolume(float volume)
-        {
-            masterVolume = Mathf.Clamp01(volume);
-        }
-
         void Update()
         {
-            float actualTargetVolume = _targetVolume * masterVolume;
+            float actualTargetVolume = _targetVolume/* * masterVolume*/;
 
             if (!Mathf.Approximately(_audioSource.volume, actualTargetVolume))
             {
@@ -147,9 +145,22 @@ namespace ImPulse.Core
             }
         }
 
+        // for setting the actual volume of the audio source, use SetMasterVolume for output volume
         public void SetVolume(float newVolume)
         {
-            _targetVolume = Mathf.Clamp01(newVolume);
+            _targetVolume = newVolume;
+            _targetVolume = Mathf.Clamp(_targetVolume, 0.00001f, 1f); // low but not 0 so that we have smth to amplify for the visualizer
+        }
+
+        public void SetMasterVolume(float volume)
+        {
+            masterVolume = Mathf.Clamp01(volume); 
+            
+            if (mixer != null)
+            {
+                float dB = masterVolume > 0.0001f ? Mathf.Log10(masterVolume) * 20f : -80f;
+                mixer.SetFloat("Master", dB);
+            }
         }
 
         private void EvaluatePattern(int beatIndex, PatternResolution resolution)

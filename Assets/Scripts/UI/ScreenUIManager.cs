@@ -13,6 +13,9 @@ namespace ImPulse.UI
         [SerializeField] private UIFader deathScreenFader;
         [SerializeField] private UIFader pauseScreenFader;
 
+        [Header("HUD Elements")]
+        [SerializeField] private GameObject audioVisualizer;
+
         [Header("Pause Controls")]
         [SerializeField] private Slider volumeSlider;
 
@@ -31,9 +34,7 @@ namespace ImPulse.UI
 
             if (_audioHandler != null && volumeSlider != null)
             {
-                // Sync the slider to the handler's starting value
                 volumeSlider.value = _audioHandler.masterVolume;
-                // Add a listener so the audio updates in real time as the player drags the slider
                 volumeSlider.onValueChanged.AddListener((val) => _audioHandler.SetMasterVolume(val));
             }
 
@@ -60,18 +61,21 @@ namespace ImPulse.UI
                     if (startScreenFader != null) startScreenFader.FadeTo(1f); 
                     if (deathScreenFader != null) deathScreenFader.FadeTo(0f);
                     if (pauseScreenFader != null) pauseScreenFader.FadeTo(0f);
+                    if (audioVisualizer != null) audioVisualizer.SetActive(false);
                     break;
 
                 case GameState.Playing:
                     if (startScreenFader != null) startScreenFader.FadeTo(0f); 
                     if (deathScreenFader != null) deathScreenFader.FadeTo(0f);
                     if (pauseScreenFader != null) pauseScreenFader.FadeTo(0f);
+                    if (audioVisualizer != null) audioVisualizer.SetActive(true);
                     break;
 
                 case GameState.Paused:
                     if (startScreenFader != null) startScreenFader.FadeTo(0f); 
                     if (deathScreenFader != null) deathScreenFader.FadeTo(0f);
                     if (pauseScreenFader != null) pauseScreenFader.FadeTo(1f);
+                    if (audioVisualizer != null) audioVisualizer.SetActive(false);
                     break;
 
                 case GameState.GameOver:
@@ -79,6 +83,7 @@ namespace ImPulse.UI
                     if (startScreenFader != null) startScreenFader.FadeTo(0f); 
                     if (deathScreenFader != null) deathScreenFader.FadeTo(1f); 
                     if (pauseScreenFader != null) pauseScreenFader.FadeTo(0f);
+                    if (audioVisualizer != null) audioVisualizer.SetActive(false);
                     break;
             }
         }
